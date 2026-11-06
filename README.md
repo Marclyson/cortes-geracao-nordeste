@@ -5,8 +5,8 @@ Elétrico). Desde 2023 o ONS limita a geração de usinas eólicas e solares, pr
 por falta de capacidade de transmissão, por segurança da rede ou por falta de consumo. O setor chama
 isso de *constrained-off* ou *curtailment*. O projeto mede quanta energia deixou de ser gerada, onde e por qual motivo.
 
-Em andamento. Feito até aqui: a carga dos dados brutos com Airflow e a modelagem com dbt. Faltam a
-integração contínua no GitHub Actions e o painel em Power BI.
+Em andamento. Feito até aqui: a carga dos dados brutos com Airflow, a modelagem com dbt e a
+integração contínua no GitHub Actions. Falta o painel em Power BI.
 
 ## Dados
 
@@ -68,6 +68,33 @@ Para rodar o dbt à mão, fora do Airflow:
 docker compose run --rm dbt build
 ```
 
+## Integração contínua
+
+O workflow `.github/workflows/ci.yml` roda a cada push na `main` e em cada pull request, com três jobs:
+
+- Lint do SQL: `sqlfluff lint` nos modelos e testes do dbt, com a configuração do `.sqlfluff`.
+- DAGs e carga: instala o Airflow 3.3.2 com o arquivo oficial de restrições de versão e roda o
+  `pytest`. Os testes conferem se os DAGs importam sem erro, se as cargas avisam o DAG do dbt e se a
+  janela de meses da carga está certa.
+- dbt build na amostra: sobe um Postgres descartável, carrega `ci/amostra/` no `raw` com a mesma
+  função que a carga do Airflow usa e roda `dbt build` duas vezes, a segunda já incremental.
+
+A amostra tem três dias de outubro de 2026 de 15 usinas, escolhidas para cobrir as três razões de
+restrição, usinas sem restrição e uma com código CEG. Ela é gerada por `scripts/gerar_amostra.py`
+a partir dos arquivos que a carga baixou.
+
+Para rodar as mesmas verificações na máquina, fora do Docker:
+
+```bash
+python -m venv .venv
+.venv/Scripts/pip install -r requirements-ci.txt
+.venv/Scripts/sqlfluff lint dbt/models dbt/tests
+.venv/Scripts/python -m pytest tests
+```
+
+No Windows o teste dos DAGs é pulado, porque o Airflow não roda direto no Windows. Ele roda dentro
+da imagem do projeto ou no CI.
+
 ## Como rodar
 
 Precisa do Docker com Docker Compose e do Python 3 (só para gerar o `.env`). A imagem do Airflow
@@ -99,10 +126,13 @@ dags/dbt_cortes.py      DAG do dbt, disparado pelas cargas
 dags/ons/carga.py       download, comparação de ETag e carga no Postgres
 dags/ons/ativos.py      Assets das tabelas raw
 dbt/                    projeto dbt (staging, intermediate, marts, snapshot, testes)
+ci/amostra/             amostra de dados para o CI
+tests/                  testes em Python (DAGs e carga)
+scripts/                geração do .env e da amostra, carga da amostra
+.github/workflows/      CI
 Dockerfile              imagem do Airflow com o dbt
 docker-compose.yml      Airflow 3 (LocalExecutor), Postgres 17 e o dbt para uso à mão
 postgres/init.sql       cria os bancos airflow e dw
-scripts/criar_env.py    gera o .env
 ```
 
 ## Licença

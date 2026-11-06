@@ -13,4 +13,4 @@ select distinct on (usina_id)
     ponto_conexao,
     agente_operador
 from {{ ref('int_restricao_semihoraria') }}
-order by usina_id, instante desc
+order by usina_id asc, instante desc

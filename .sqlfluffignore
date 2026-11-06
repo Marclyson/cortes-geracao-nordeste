@@ -1,0 +1,4 @@
+dbt/target/
+dbt/logs/
+dbt/macros/
+dbt/tests/generic/

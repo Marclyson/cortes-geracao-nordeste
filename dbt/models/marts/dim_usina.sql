@@ -5,7 +5,10 @@ with atual as (
 ),
 
 periodo as (
-    select usina_id, min(dia) as primeiro_dia, max(dia) as ultimo_dia
+    select
+        usina_id,
+        min(dia) as primeiro_dia,
+        max(dia) as ultimo_dia
     from {{ ref('fct_restricao_usina_dia') }}
     group by usina_id
 )
@@ -15,7 +18,7 @@ select
     atual.fonte,
     atual.usina_nome,
     atual.ceg,
-    atual.ceg is null                as conjunto_de_usinas,
+    atual.ceg is null as conjunto_de_usinas,
     atual.uf,
     atual.estado,
     atual.subsistema_id,
@@ -25,6 +28,6 @@ select
     atual.agente_operador,
     periodo.primeiro_dia,
     periodo.ultimo_dia,
-    atual.dbt_valid_from             as cadastro_desde
+    atual.dbt_valid_from as cadastro_desde
 from atual
-left join periodo using (usina_id)
+left join periodo on atual.usina_id = periodo.usina_id

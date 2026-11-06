@@ -163,6 +163,46 @@ def copiar_csv(cur, sql, buffer):
             copia.write(bloco)
 
 
+def gravar_tabela(conn, fonte, tabela, arquivo, controle=None):
+    """Troca as linhas de um arquivo em raw.<fonte> numa transação.
+
+    `controle`, se vier, é gravado em raw._cargas na mesma transação (mes, etag, modificado_em, bytes).
+    Devolve quantas linhas saíram. O CI usa esta função para carregar a amostra de teste.
+    """
+    tabela = tabela.rename_columns([c.lower() for c in tabela.column_names])
+    esquema_fonte = tabela.schema
+    tabela = tabela.append_column("_arquivo", pa.array([arquivo] * tabela.num_rows, pa.string()))
+
+    buffer = io.BytesIO()
+    pacsv.write_csv(tabela, buffer, pacsv.WriteOptions(include_header=False))
+    buffer.seek(0)
+    colunas = ", ".join(f'"{c}"' for c in tabela.column_names)
+
+    try:
+        with conn.cursor() as cur:
+            # download e leitura correm em paralelo; a escrita na tabela é uma de cada vez, porque o
+            # create/alter de uma tarefa e o delete de outra travavam uma à outra (deadlock)
+            cur.execute("select pg_advisory_xact_lock(hashtext(%s))", (f"raw.{fonte}",))
+            preparar_tabelas(cur, fonte, esquema_fonte)
+            cur.execute(f"delete from raw.{fonte} where _arquivo = %s", (arquivo,))
+            removidas = cur.rowcount
+            copiar_csv(cur, f"copy raw.{fonte} ({colunas}) from stdin with (format csv)", buffer)
+            if controle:
+                cur.execute("""
+                    insert into raw._cargas (fonte, arquivo, mes, etag, modificado_em, bytes, linhas)
+                    values (%s, %s, %s, %s, %s, %s, %s)
+                    on conflict (fonte, arquivo) do update set
+                        etag = excluded.etag, modificado_em = excluded.modificado_em, bytes = excluded.bytes,
+                        linhas = excluded.linhas, carregado_em = now()""",
+                            (fonte, arquivo, controle["mes"], controle["etag"], controle["modificado_em"],
+                             controle["bytes"], tabela.num_rows))
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    return removidas
+
+
 def carregar_mes(conn, fonte, mes, forcar=False):
     """Carrega um mês de uma fonte. Devolve um dicionário com o que aconteceu."""
     url = url_do_mes(fonte, mes)
@@ -184,35 +224,7 @@ def carregar_mes(conn, fonte, mes, forcar=False):
     destino = DADOS / FONTES[fonte]["pasta"] / arquivo
     baixar(url, destino)
     tabela = pq.read_table(destino)
-    tabela = tabela.rename_columns([c.lower() for c in tabela.column_names])
-    esquema_fonte = tabela.schema
-    tabela = tabela.append_column("_arquivo", pa.array([arquivo] * tabela.num_rows, pa.string()))
-
-    buffer = io.BytesIO()
-    pacsv.write_csv(tabela, buffer, pacsv.WriteOptions(include_header=False))
-    buffer.seek(0)
-    colunas = ", ".join(f'"{c}"' for c in tabela.column_names)
-
-    try:
-        with conn.cursor() as cur:
-            # download e leitura correm em paralelo; a escrita na tabela é uma de cada vez, porque o
-            # create/alter de uma tarefa e o delete de outra travavam uma à outra (deadlock)
-            cur.execute("select pg_advisory_xact_lock(hashtext(%s))", (f"raw.{fonte}",))
-            preparar_tabelas(cur, fonte, esquema_fonte)
-            cur.execute(f"delete from raw.{fonte} where _arquivo = %s", (arquivo,))
-            removidas = cur.rowcount
-            copiar_csv(cur, f"copy raw.{fonte} ({colunas}) from stdin with (format csv)", buffer)
-            cur.execute("""
-                insert into raw._cargas (fonte, arquivo, mes, etag, modificado_em, bytes, linhas)
-                values (%s, %s, %s, %s, %s, %s, %s)
-                on conflict (fonte, arquivo) do update set
-                    etag = excluded.etag, modificado_em = excluded.modificado_em, bytes = excluded.bytes,
-                    linhas = excluded.linhas, carregado_em = now()""",
-                        (fonte, arquivo, mes, info["etag"], info["modificado_em"], info["bytes"], tabela.num_rows))
-        conn.commit()
-    except Exception:
-        conn.rollback()
-        raise
+    removidas = gravar_tabela(conn, fonte, tabela, arquivo, controle={"mes": mes, **info})
     return {
         "fonte": fonte,
         "mes": mes,

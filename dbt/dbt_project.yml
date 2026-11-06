@@ -1,0 +1,32 @@
+name: cortes_nordeste
+version: "0.1.0"
+profile: cortes_nordeste
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+test-paths: ["tests"]
+clean-targets: ["target", "logs"]
+
+models:
+  cortes_nordeste:
+    staging:
+      +schema: staging
+      +materialized: view
+    intermediate:
+      +schema: intermediate
+      +materialized: view
+    marts:
+      +schema: marts
+      +materialized: table
+
+snapshots:
+  cortes_nordeste:
+    +schema: snapshots
+
+data_tests:
+  cortes_nordeste:
+    +store_failures: false
+
+flags:
+  send_anonymous_usage_stats: false

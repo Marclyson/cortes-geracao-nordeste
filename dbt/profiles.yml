@@ -1,0 +1,13 @@
+# Usuário e senha vêm das variáveis de ambiente (o .env, no Docker). Nada de segredo aqui.
+cortes_nordeste:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('DBT_HOST', 'postgres') }}"
+      port: "{{ env_var('DBT_PORT', '5432') | as_number }}"
+      user: "{{ env_var('POSTGRES_USER') }}"
+      password: "{{ env_var('POSTGRES_PASSWORD') }}"
+      dbname: "{{ env_var('DBT_DBNAME', 'dw') }}"
+      schema: dbt
+      threads: 4

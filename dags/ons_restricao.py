@@ -12,6 +12,7 @@ import pendulum
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 from airflow.sdk import Param, dag, get_current_context, task
 
+from ons.ativos import ATIVOS
 from ons.carga import FONTES, carregar_mes, meses_da_execucao
 
 RIO = pendulum.timezone("America/Sao_Paulo")
@@ -56,7 +57,8 @@ def criar_dag(fonte):
             print(resultado)
             return resultado
 
-        @task
+        # ao terminar, avisa o DAG do dbt que a tabela raw desta fonte foi conferida
+        @task(outlets=[ATIVOS[fonte]])
         def resumir(resultados):
             contagem = {}
             for r in resultados:

@@ -1,0 +1,21 @@
+sources:
+  - name: ons
+    description: >
+      Dados abertos do ONS carregados pelo Airflow (DAGs ons_restricao_*). Licença CC BY 4.0.
+      Um registro por usina ou conjunto de usinas a cada 30 minutos.
+    schema: raw
+    config:
+      loaded_at_field: din_instante
+      freshness:
+        # o ONS publica o dia anterior; mais de 3 dias sem dado novo indica problema na fonte ou na carga
+        warn_after: {count: 3, period: day}
+        error_after: {count: 6, period: day}
+    tables:
+      - name: restricao_eolica
+        description: Restrição de operação por constrained-off das usinas eólicas (desde out/2021).
+      - name: restricao_solar
+        description: Restrição de operação por constrained-off das usinas fotovoltaicas (desde abr/2024).
+      - name: _cargas
+        description: Controle da carga, uma linha por arquivo mensal, com o ETag da última versão baixada.
+        config:
+          freshness: null

@@ -1,0 +1,65 @@
+models:
+  - name: stg_ons__restricao_eolica
+    description: Restrição das usinas eólicas com nomes claros e energia em MWh.
+    data_tests: &testes_restricao
+      - combinacao_unica:
+          arguments:
+            colunas: [usina_id, instante]
+    columns: &colunas_restricao
+      - name: usina_id
+        description: Identificador da usina ou do conjunto de usinas no ONS.
+        data_tests: [not_null]
+      - name: ceg
+        description: Código da usina na ANEEL. Nulo para conjuntos de usinas, que não têm CEG.
+      - name: instante
+        description: Início do patamar de 30 minutos.
+        data_tests: [not_null]
+      - name: geracao_mwh
+        description: Geração verificada no patamar, em MWh.
+        data_tests: [not_null]
+      - name: nao_realizada_mwh
+        description: >
+          Geração não realizada apurada (GNRa), em MWh. É a geração de referência menos a verificada,
+          nos patamares com limitação, e nunca fica negativa. Zero quando não houve limitação.
+        data_tests:
+          - not_null
+          - entre:
+              arguments: {minimo: 0, maximo: 100000}
+      - name: razao
+        description: "Razão da restrição: ENE (energética), CNF (confiabilidade), REL (indisponibilidade externa) ou PAR (parecer de acesso)."
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [ENE, CNF, REL, PAR]
+      - name: origem
+        description: "Origem da restrição: LOC (local) ou SIS (sistêmica)."
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [LOC, SIS]
+      - name: minutos_restricao
+        description: Minutos com restrição dentro do patamar. O ONS publica alguns valores fora de 0 a 30.
+        data_tests:
+          - entre:
+              arguments: {minimo: 0, maximo: 30}
+              config:
+                severity: warn
+
+  - name: stg_ons__restricao_solar
+    description: Restrição das usinas fotovoltaicas com nomes claros e energia em MWh.
+    data_tests: *testes_restricao
+    columns: *colunas_restricao
+
+unit_tests:
+  - name: staging_converte_unidades_e_nulos
+    description: MWmed vira MWh, GNRa nula vira zero e o traço no CEG vira nulo.
+    model: stg_ons__restricao_eolica
+    given:
+      - input: source('ons', 'restricao_eolica')
+        rows:
+          - {id_ons: CJU_X, ceg: "-", din_instante: "2026-10-01 10:30:00", val_geracao: 100, val_geracaolimitada: null, val_geracaonaorealizadaapurada: null}
+          - {id_ons: EOL_Y, ceg: "EOL.CV.RN.000001-1.01", din_instante: "2026-10-01 11:00:00", val_geracao: 40, val_geracaolimitada: 40, val_geracaonaorealizadaapurada: 60}
+    expect:
+      rows:
+        - {usina_id: CJU_X, ceg: null, dia: "2026-10-01", geracao_mwh: 50, limitada: false, nao_realizada_mwh: 0}
+        - {usina_id: EOL_Y, ceg: "EOL.CV.RN.000001-1.01", dia: "2026-10-01", geracao_mwh: 20, limitada: true, nao_realizada_mwh: 30}

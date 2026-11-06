@@ -5,7 +5,8 @@
 # Tudo escuta só em 127.0.0.1: Airflow em http://localhost:8080, Postgres na porta 5433.
 
 x-airflow: &airflow
-  image: apache/airflow:3.3.2-python3.12
+  build: .
+  image: cortes-nordeste-airflow:3.3.2-dbt1.12
   env_file: .env
   user: "50000:0"
   environment: &airflow-env
@@ -19,10 +20,12 @@ x-airflow: &airflow
     AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_ALL_ADMINS: "true"
     AIRFLOW__DAG_PROCESSOR__REFRESH_INTERVAL: "30"
     AIRFLOW_CONN_DW: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/dw
+    DBT_PROFILES_DIR: /opt/airflow/dbt
   volumes:
     - ./dags:/opt/airflow/dags
     - ./dados:/opt/airflow/dados
     - ./logs:/opt/airflow/logs
+    - ./dbt:/opt/airflow/dbt
   depends_on: &airflow-depends
     postgres:
       condition: service_healthy
@@ -41,6 +44,15 @@ services:
       interval: 5s
       retries: 10
     restart: unless-stopped
+
+  # dbt à mão, fora do Airflow: docker compose run --rm dbt build
+  dbt:
+    <<: *airflow
+    entrypoint: ["/opt/dbt/bin/dbt"]
+    command: ["--help"]
+    working_dir: /opt/airflow/dbt
+    profiles: ["ferramentas"]
+    restart: "no"
 
   airflow-init:
     <<: *airflow

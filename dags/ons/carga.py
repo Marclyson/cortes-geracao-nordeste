@@ -149,6 +149,8 @@ def preparar_tabelas(cur, fonte, esquema):
         if c.name not in existentes:
             cur.execute(f'alter table raw.{fonte} add column "{c.name}" {_tipo_postgres(c.type)}')
     cur.execute(f"create index if not exists {fonte}_arquivo on raw.{fonte} (_arquivo)")
+    # o dbt lê a fonte em lotes mensais filtrando pelo instante
+    cur.execute(f"create index if not exists {fonte}_instante on raw.{fonte} (din_instante)")
 
 
 def copiar_csv(cur, sql, buffer):

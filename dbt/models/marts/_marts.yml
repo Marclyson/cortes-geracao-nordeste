@@ -1,0 +1,44 @@
+models:
+  - name: fct_restricao_usina_dia
+    description: >
+      Geração e geração não realizada por usina e dia, em MWh, com a parte não realizada separada
+      pela razão da restrição. Incremental em lotes mensais, refazendo os três meses mais recentes.
+    data_tests:
+      - combinacao_unica:
+          arguments:
+            colunas: [usina_id, dia]
+    columns:
+      - name: usina_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_usina')
+                field: usina_id
+      - name: dia
+        data_tests: [not_null]
+      - name: fonte
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [eolica, solar]
+      - name: patamares
+        description: Patamares de 30 minutos no dia. Normalmente 48.
+        data_tests:
+          - entre:
+              arguments: {minimo: 1, maximo: 50}
+      - name: horas_restricao
+        description: Horas com restrição no dia (minutos fora de 0 a 30 são limitados a esse intervalo).
+      - name: nao_realizada_mwh
+        description: Geração não realizada apurada no dia, em MWh.
+
+  - name: dim_usina
+    description: Cadastro atual das usinas e conjuntos de usinas, a partir do snapshot snap_usina.
+    columns:
+      - name: usina_id
+        data_tests: [unique, not_null]
+      - name: fonte
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [eolica, solar]

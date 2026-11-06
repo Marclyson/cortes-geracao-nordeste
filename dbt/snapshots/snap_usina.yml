@@ -1,0 +1,11 @@
+snapshots:
+  - name: snap_usina
+    description: >
+      Histórico do cadastro das usinas (nome, agente operador, ponto de conexão). Cada execução
+      compara o cadastro atual com a última versão guardada e abre uma versão nova quando algo muda.
+    relation: ref('int_usina_cadastro')
+    config:
+      unique_key: usina_id
+      strategy: check
+      check_cols: [usina_nome, ceg, uf, subsistema_id, ponto_conexao_id, ponto_conexao, agente_operador]
+      hard_deletes: invalidate

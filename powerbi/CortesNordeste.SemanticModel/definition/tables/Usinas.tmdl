@@ -1,0 +1,129 @@
+/// Cadastro atual das usinas e conjuntos (marts.dim_usina)
+table Usinas
+	lineageTag: 114ac353-0ead-4ff3-9a3b-df5158d646f6
+
+	column 'ID da usina'
+		dataType: string
+		isKey
+		lineageTag: e91977a8-afee-48eb-9d45-c67bbbe0ad0f
+		summarizeBy: none
+		sourceColumn: usina_id
+
+	column Fonte
+		dataType: string
+		lineageTag: 52474d98-bd3e-49a1-a0b9-65f32a92aaf3
+		summarizeBy: none
+		sourceColumn: fonte_nome
+
+	column 'Código da fonte'
+		dataType: string
+		isHidden
+		lineageTag: 0db6e49e-c86e-4279-a6b2-dc33eb13eb8d
+		summarizeBy: none
+		sourceColumn: fonte
+
+	/// Nome para exibição, sem repetição: o ONS usa o mesmo nome para mais de uma usina (marts.dim_usina.usina_rotulo)
+	column Usina
+		dataType: string
+		lineageTag: eb75d534-6838-4aee-b4d8-6c210e27b8d4
+		summarizeBy: none
+		sourceColumn: usina_rotulo
+
+	column CEG
+		dataType: string
+		lineageTag: 0779921a-c5f0-4937-81d3-4ce91c1a44ac
+		summarizeBy: none
+		sourceColumn: ceg
+
+	column 'Conjunto de usinas'
+		dataType: boolean
+		lineageTag: cbba6af2-c829-422e-81f9-cb6ae5b66530
+		summarizeBy: none
+		sourceColumn: conjunto_de_usinas
+
+	column UF
+		dataType: string
+		lineageTag: fb54804c-a4e4-461b-ba33-1546728c561e
+		summarizeBy: none
+		sourceColumn: uf
+
+	column Estado
+		dataType: string
+		lineageTag: 587ffd35-ff61-4bf9-835c-0e8ef752e1a7
+		summarizeBy: none
+		sourceColumn: estado
+
+	column subsistema_id
+		dataType: string
+		isHidden
+		lineageTag: 8b84eaee-3dca-42eb-92a2-17b5e60720ea
+		summarizeBy: none
+		sourceColumn: subsistema_id
+
+	column Subsistema
+		dataType: string
+		lineageTag: 5de3c48b-396d-41f9-bae9-3904624c6a40
+		summarizeBy: none
+		sourceColumn: subsistema
+
+	column ponto_conexao_id
+		dataType: string
+		isHidden
+		lineageTag: 8d3d989a-24c9-44c6-a3fb-b17bcb2beb44
+		summarizeBy: none
+		sourceColumn: ponto_conexao_id
+
+	column 'Ponto de conexão'
+		dataType: string
+		lineageTag: 3c7b66d0-aaa1-40a4-8784-8a3fd8d4fe57
+		summarizeBy: none
+		sourceColumn: ponto_conexao
+
+	column 'Agente operador'
+		dataType: string
+		lineageTag: ca2612e7-a426-46d8-ba39-9cfb31f11a4e
+		summarizeBy: none
+		sourceColumn: agente_operador
+
+	column 'Primeiro dia'
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: f21606bd-ca41-4cba-89b7-4d6ae3682ece
+		summarizeBy: none
+		sourceColumn: primeiro_dia
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Último dia'
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 6a8f9f41-caec-42a8-ac5f-498c4639ba2b
+		summarizeBy: none
+		sourceColumn: ultimo_dia
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column cadastro_desde
+		dataType: dateTime
+		isHidden
+		formatString: dd/mm/yyyy
+		lineageTag: c0fafa0d-2e17-4336-9f58-dd2ec4b0d148
+		summarizeBy: none
+		sourceColumn: cadastro_desde
+
+	/// Nome como está no cadastro do ONS, que pode se repetir entre usinas
+	column 'Nome no cadastro'
+		dataType: string
+		lineageTag: edb3fb83-b8a3-4034-b62f-f812dea6590d
+		summarizeBy: none
+		sourceColumn: usina_nome
+
+	partition Usinas = m
+		mode: import
+		source =
+				let
+				    Fonte = PostgreSQL.Database(Servidor, Banco),
+				    Tabela = Fonte{[Schema = "marts", Item = "dim_usina"]}[Data]
+				in
+				    Tabela
+

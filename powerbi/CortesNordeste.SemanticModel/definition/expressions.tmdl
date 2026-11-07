@@ -1,0 +1,12 @@
+/// Endereço do Postgres do projeto (docker compose publica em localhost:5433)
+expression Servidor = "localhost:5433" meta [IsParameterQuery = true, Type = "Text", IsParameterQueryRequired = true]
+	lineageTag: 267f2eaa-de41-447d-92f3-fcc2811f0642
+
+	annotation PBI_ResultType = Text
+
+/// Banco com os schemas raw, staging e marts
+expression Banco = "dw" meta [IsParameterQuery = true, Type = "Text", IsParameterQueryRequired = true]
+	lineageTag: aa576fba-5b2d-4c49-98be-c4195dd3b9eb
+
+	annotation PBI_ResultType = Text
+

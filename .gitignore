@@ -9,3 +9,7 @@ dbt/logs/
 dbt/dbt_packages/
 dbt/.user.yml
 .airflow/
+
+# backups locais do painel
+_backup_*/
+_report_teste.tgz

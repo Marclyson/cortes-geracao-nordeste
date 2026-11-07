@@ -16,7 +16,12 @@ models:
                 to: ref('dim_usina')
                 field: usina_id
       - name: dia
-        data_tests: [not_null]
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_data')
+                field: dia
       - name: fonte
         data_tests:
           - accepted_values:
@@ -31,6 +36,39 @@ models:
         description: Horas com restrição no dia (minutos fora de 0 a 30 são limitados a esse intervalo).
       - name: nao_realizada_mwh
         description: Geração não realizada apurada no dia, em MWh.
+      - name: nao_realizada_loc_mwh
+        description: Parte da geração não realizada com origem local (restrição na rede próxima à usina).
+      - name: nao_realizada_sis_mwh
+        description: Parte da geração não realizada com origem sistêmica (restrição do sistema interligado).
+      - name: nao_realizada_sem_origem_mwh
+        description: Parte da geração não realizada sem origem informada pelo ONS.
+
+  - name: fct_restricao_perfil_horario
+    description: >
+      Geração e geração não realizada por mês, fonte, estado e patamar de 30 minutos do dia, em MWh.
+      Agregado sem a usina para mostrar em que horas o corte se concentra. Incremental em lotes
+      mensais, com a mesma janela da fato diária.
+    data_tests:
+      - combinacao_unica:
+          arguments:
+            colunas: [mes, fonte, uf, patamar]
+    columns:
+      - name: mes
+        description: Primeiro dia do mês.
+        data_tests: [not_null]
+      - name: fonte
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [eolica, solar]
+      - name: patamar
+        description: Início do patamar de 30 minutos (00:00 a 23:30).
+        data_tests: [not_null]
+      - name: hora
+        description: Hora do dia do patamar (0 a 23).
+        data_tests:
+          - entre:
+              arguments: {minimo: 0, maximo: 23}
 
   - name: dim_usina
     description: Cadastro atual das usinas e conjuntos de usinas, a partir do snapshot snap_usina.
@@ -42,3 +80,14 @@ models:
           - accepted_values:
               arguments:
                 values: [eolica, solar]
+      - name: usina_rotulo
+        description: >-
+          Nome da usina para exibição, sem repetição. Quando o ONS usa o mesmo nome para mais de uma
+          usina, acrescenta a fonte e, se ainda repetir, o código da usina.
+        data_tests: [unique, not_null]
+
+  - name: dim_data
+    description: Calendário diário do primeiro ao último mês com dados, com rótulos de mês em português.
+    columns:
+      - name: dia
+        data_tests: [unique, not_null]

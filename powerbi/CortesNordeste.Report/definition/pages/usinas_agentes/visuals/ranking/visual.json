@@ -1,0 +1,322 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.3.0/schema.json",
+  "name": "ranking",
+  "position": {
+    "x": 24,
+    "y": 84,
+    "z": 2000,
+    "height": 616,
+    "width": 700,
+    "tabOrder": 4000
+  },
+  "visual": {
+    "visualType": "htmlContent443BE3AD55E043BF878BED274D3A6865",
+    "query": {
+      "queryState": {
+        "content": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Restrição diária"
+                    }
+                  },
+                  "Property": "html · Linha ranking"
+                }
+              },
+              "queryRef": "Restrição diária.html · Linha ranking",
+              "nativeQueryRef": "html · Linha ranking"
+            }
+          ]
+        },
+        "sampling": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Usinas"
+                    }
+                  },
+                  "Property": "ID da usina"
+                }
+              },
+              "queryRef": "Usinas.ID da usina",
+              "nativeQueryRef": "ID da usina"
+            }
+          ]
+        },
+        "tooltips": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Restrição diária"
+                    }
+                  },
+                  "Property": "Ranking · valor"
+                }
+              },
+              "queryRef": "Restrição diária.Ranking · valor",
+              "nativeQueryRef": "Ranking · valor"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Restrição diária"
+                  }
+                },
+                "Property": "Ranking · valor"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "objects": {
+      "compatibility": [
+        {
+          "properties": {
+            "legacyRendering": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stylesheet": [
+        {
+          "properties": {
+            "stylesheet": {
+              "expr": {
+                "Literal": {
+                  "Value": "'*{font-family:''Segoe UI'',sans-serif}.vazio{font-size:13px;color:#8A8886}.lin{display:grid;grid-template-columns:26px 1fr 130px 70px 124px;gap:8px;align-items:center;padding:5px 6px;border-bottom:1px solid #EDEBE9;cursor:pointer}\n.lin:hover{background:#F6F5F3}\n.cab{cursor:default;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:#8A8886;font-weight:600;padding-top:0;border-bottom:1px solid #E1DFDD}\n.cab:hover{background:none}\n.dir{text-align:right}.r{font-size:16px;font-weight:600;color:#C8C6C4}\n.top .r{color:#967100}\n.nm{font-size:12px;font-weight:600;color:#191919}.mt{font-size:10px;color:#8A8886;margin-top:1px}\n.vl{font-size:12px;font-weight:600;color:#191919}.pc{font-size:12px;color:#605E5C}\n.bar{height:4px;background:#EDEBE9;margin-top:4px;width:110px;margin-left:auto}.bar span{display:block;height:4px;background:#F2C811}'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "crossFilter": [
+        {
+          "properties": {
+            "enabled": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "contentFormatting": [
+        {
+          "properties": {
+            "noDataMessage": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Sem geração não realizada nos filtros selecionados.'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'As 10 usinas e conjuntos com mais geração não realizada · clique para filtrar'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "11D"
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#191919'"
+                    }
+                  }
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#FFFFFF'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#E1DFDD'"
+                    }
+                  }
+                }
+              }
+            },
+            "width": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
+                }
+              }
+            },
+            "radius": {
+              "expr": {
+                "Literal": {
+                  "Value": "2D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualHeader": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "padding": [
+        {
+          "properties": {
+            "top": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "bottom": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "left": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "right": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Lista das 10 usinas e conjuntos com mais geração não realizada, com percentual cortado e tendência. Clique numa usina para filtrar a página.'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

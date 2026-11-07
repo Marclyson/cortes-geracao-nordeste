@@ -1,0 +1,1160 @@
+/// Geração e geração não realizada por usina e dia (marts.fct_restricao_usina_dia)
+table 'Restrição diária'
+	lineageTag: 69a8757d-1788-4416-aeab-a03c13816a37
+
+	/// Geração verificada, em GWh
+	measure 'Geração (GWh)' = DIVIDE(SUM('Restrição diária'[geracao_mwh]), 1000)
+		formatString: #,0
+		lineageTag: 98e3fde5-8ad1-4c69-921c-9cae748e0b30
+
+	/// Geração não realizada apurada (GNRa) pelo ONS, em GWh
+	measure 'Não realizada (GWh)' = DIVIDE(SUM('Restrição diária'[nao_realizada_mwh]), 1000)
+		formatString: #,0
+		lineageTag: 194894c2-0c70-4347-85a4-b0765951c755
+
+	/// Parte da geração possível (verificada mais não realizada) que deixou de acontecer
+	measure '% cortado' = DIVIDE([Não realizada (GWh)], [Geração (GWh)] + [Não realizada (GWh)])
+		formatString: 0.0%
+		lineageTag: 735a25d1-c101-4323-a957-a4caa03dd583
+
+	/// Usinas ou conjuntos com alguma geração não realizada no período
+	measure 'Usinas com corte' = CALCULATE(DISTINCTCOUNT('Restrição diária'[usina_id]), 'Restrição diária'[nao_realizada_mwh] > 0)
+		formatString: #,0
+		lineageTag: 37eedd0d-dadd-4db7-888a-202072502c2c
+
+	/// Último dia com dados
+	measure 'Dados até' = "Dados até " & FORMAT(MAX('Restrição diária'[dia]), "dd/mm/yyyy")
+		formatString: General
+		lineageTag: 86b4f5b0-72c1-41ad-8ef9-4a15b1c5aa04
+
+	measure 'Energética (ENE)' = DIVIDE(SUM('Restrição diária'[nao_realizada_ene_mwh]), 1000)
+		formatString: #,0
+		displayFolder: Por razão
+		lineageTag: ec6777a3-eef9-4356-ac98-2bc31829ff48
+
+	measure 'Confiabilidade (CNF)' = DIVIDE(SUM('Restrição diária'[nao_realizada_cnf_mwh]), 1000)
+		formatString: #,0
+		displayFolder: Por razão
+		lineageTag: f7bb3b37-0767-4ef6-8b95-d36daff83c1e
+
+	measure 'Indisponibilidade externa (REL)' = DIVIDE(SUM('Restrição diária'[nao_realizada_rel_mwh]), 1000)
+		formatString: #,0
+		displayFolder: Por razão
+		lineageTag: 59a66fa0-cc78-4e8c-9890-c9a92ed129b4
+
+	measure 'Parecer de acesso (PAR)' = DIVIDE(SUM('Restrição diária'[nao_realizada_par_mwh]), 1000)
+		formatString: #,0
+		displayFolder: Por razão
+		lineageTag: 80f67c14-4086-4190-b9f2-c1c1ecd4e8cb
+
+	/// Geração verificada mais geração não realizada
+	measure 'Geração possível (GWh)' = [Geração (GWh)] + [Não realizada (GWh)]
+		formatString: #,0
+		displayFolder: Base
+		lineageTag: d4738451-04a7-5afc-8743-0b358a63c17e
+
+	/// Geração não realizada sem razão informada pelo ONS
+	measure 'Sem razão (GWh)' = DIVIDE(SUM('Restrição diária'[nao_realizada_sem_razao_mwh]), 1000)
+		formatString: #,0
+		displayFolder: Por razão
+		lineageTag: 955bd5f7-aeac-5316-992f-8286d9e9041c
+
+	/// Restrição de origem local (rede próxima à usina)
+	measure 'Origem local (GWh)' = DIVIDE(SUM('Restrição diária'[nao_realizada_loc_mwh]), 1000)
+		formatString: #,0
+		displayFolder: Por origem
+		lineageTag: e4902b9f-ab03-5314-9a84-5b318dcedc89
+
+	/// Restrição de origem sistêmica (sistema interligado)
+	measure 'Origem sistêmica (GWh)' = DIVIDE(SUM('Restrição diária'[nao_realizada_sis_mwh]), 1000)
+		formatString: #,0
+		displayFolder: Por origem
+		lineageTag: 74f4909a-0397-515d-beeb-fdc4249866c4
+
+	/// Geração não realizada sem origem informada
+	measure 'Sem origem (GWh)' = DIVIDE(SUM('Restrição diária'[nao_realizada_sem_origem_mwh]), 1000)
+		formatString: #,0
+		displayFolder: Por origem
+		lineageTag: 640078ec-6844-5f6d-ac8f-638035d19e8f
+
+	/// Soma das horas com restrição de cada usina em cada dia
+	measure 'Horas de restrição' = SUM('Restrição diária'[horas_restricao])
+		formatString: #,0
+		displayFolder: Base
+		lineageTag: e4defcea-960a-52c2-906b-c748e9efba92
+
+	/// Último dia com dados, ignorando o filtro de datas
+	measure 'Última data com dados' = CALCULATE(MAX('Restrição diária'[dia]), REMOVEFILTERS('Calendário'))
+		formatString: dd/mm/yyyy
+		displayFolder: Período
+		lineageTag: 49827826-68fb-5e00-b139-c79509b62b5b
+
+	/// Fim do período analisado, limitado ao último dia com dados
+	measure '_Fim do período' = MIN(MAX('Calendário'[Data]), [Última data com dados])
+		formatString: dd/mm/yyyy
+		isHidden
+		displayFolder: Período
+		lineageTag: 8fd8e624-cf74-5335-916e-fc360ad44a3c
+
+	/// [Não realizada (GWh)] no período analisado: o filtro de datas, ou os últimos 12 meses quando não há filtro
+	measure 'Não realizada · período' =
+			VAR _Fim = [_Fim do período]
+			RETURN
+			    IF (
+			        ISFILTERED ( 'Calendário' ),
+			        CALCULATE ( [Não realizada (GWh)], KEEPFILTERS ( 'Calendário'[Data] <= _Fim ) ),
+			        CALCULATE ( [Não realizada (GWh)], DATESINPERIOD ( 'Calendário'[Data], _Fim, -12, MONTH ) )
+			    )
+		formatString: #,0
+		displayFolder: Período
+		lineageTag: bef7b0d2-db76-5132-9413-08e2244cad9c
+
+	/// [Não realizada (GWh)] no mesmo período um ano antes, cortado na mesma data
+	measure 'Não realizada · ano anterior' =
+			VAR _Fim = [_Fim do período]
+			RETURN
+			    IF (
+			        ISFILTERED ( 'Calendário' ),
+			        CALCULATE (
+			            [Não realizada (GWh)],
+			            REMOVEFILTERS ( 'Calendário' ),
+			            DATEADD ( CALCULATETABLE ( VALUES ( 'Calendário'[Data] ), KEEPFILTERS ( 'Calendário'[Data] <= _Fim ) ), -1, YEAR )
+			        ),
+			        CALCULATE (
+			            [Não realizada (GWh)],
+			            REMOVEFILTERS ( 'Calendário' ),
+			            DATESINPERIOD ( 'Calendário'[Data], EDATE ( _Fim, -12 ), -12, MONTH )
+			        )
+			    )
+		formatString: #,0
+		displayFolder: Período
+		lineageTag: 31240304-e1c0-5f35-b68b-8685a664a5ee
+
+	/// [Geração (GWh)] no período analisado: o filtro de datas, ou os últimos 12 meses quando não há filtro
+	measure 'Geração · período' =
+			VAR _Fim = [_Fim do período]
+			RETURN
+			    IF (
+			        ISFILTERED ( 'Calendário' ),
+			        CALCULATE ( [Geração (GWh)], KEEPFILTERS ( 'Calendário'[Data] <= _Fim ) ),
+			        CALCULATE ( [Geração (GWh)], DATESINPERIOD ( 'Calendário'[Data], _Fim, -12, MONTH ) )
+			    )
+		formatString: #,0
+		displayFolder: Período
+		lineageTag: a6028056-5124-581c-8740-f3662f4ad710
+
+	/// [Geração (GWh)] no mesmo período um ano antes, cortado na mesma data
+	measure 'Geração · ano anterior' =
+			VAR _Fim = [_Fim do período]
+			RETURN
+			    IF (
+			        ISFILTERED ( 'Calendário' ),
+			        CALCULATE (
+			            [Geração (GWh)],
+			            REMOVEFILTERS ( 'Calendário' ),
+			            DATEADD ( CALCULATETABLE ( VALUES ( 'Calendário'[Data] ), KEEPFILTERS ( 'Calendário'[Data] <= _Fim ) ), -1, YEAR )
+			        ),
+			        CALCULATE (
+			            [Geração (GWh)],
+			            REMOVEFILTERS ( 'Calendário' ),
+			            DATESINPERIOD ( 'Calendário'[Data], EDATE ( _Fim, -12 ), -12, MONTH )
+			        )
+			    )
+		formatString: #,0
+		displayFolder: Período
+		lineageTag: f1dc2efb-c708-584f-b87d-9d2c01234910
+
+	/// [Usinas com corte] no período analisado: o filtro de datas, ou os últimos 12 meses quando não há filtro
+	measure 'Usinas com corte · período' =
+			VAR _Fim = [_Fim do período]
+			RETURN
+			    IF (
+			        ISFILTERED ( 'Calendário' ),
+			        CALCULATE ( [Usinas com corte], KEEPFILTERS ( 'Calendário'[Data] <= _Fim ) ),
+			        CALCULATE ( [Usinas com corte], DATESINPERIOD ( 'Calendário'[Data], _Fim, -12, MONTH ) )
+			    )
+		formatString: #,0
+		displayFolder: Período
+		lineageTag: bbab3ef9-afe1-57f9-b1bd-c9d153e6d38e
+
+	/// [Usinas com corte] no mesmo período um ano antes, cortado na mesma data
+	measure 'Usinas com corte · ano anterior' =
+			VAR _Fim = [_Fim do período]
+			RETURN
+			    IF (
+			        ISFILTERED ( 'Calendário' ),
+			        CALCULATE (
+			            [Usinas com corte],
+			            REMOVEFILTERS ( 'Calendário' ),
+			            DATEADD ( CALCULATETABLE ( VALUES ( 'Calendário'[Data] ), KEEPFILTERS ( 'Calendário'[Data] <= _Fim ) ), -1, YEAR )
+			        ),
+			        CALCULATE (
+			            [Usinas com corte],
+			            REMOVEFILTERS ( 'Calendário' ),
+			            DATESINPERIOD ( 'Calendário'[Data], EDATE ( _Fim, -12 ), -12, MONTH )
+			        )
+			    )
+		formatString: #,0
+		displayFolder: Período
+		lineageTag: 35a2e910-89e2-5ac6-8c7d-4dcfadc4a9ad
+
+	/// [Energética (ENE)] no período analisado: o filtro de datas, ou os últimos 12 meses quando não há filtro
+	measure 'ENE · período' =
+			VAR _Fim = [_Fim do período]
+			RETURN
+			    IF (
+			        ISFILTERED ( 'Calendário' ),
+			        CALCULATE ( [Energética (ENE)], KEEPFILTERS ( 'Calendário'[Data] <= _Fim ) ),
+			        CALCULATE ( [Energética (ENE)], DATESINPERIOD ( 'Calendário'[Data], _Fim, -12, MONTH ) )
+			    )
+		formatString: #,0
+		displayFolder: Período
+		lineageTag: 393efcaa-60b9-558a-bc65-7447efccd767
+
+	/// [Energética (ENE)] no mesmo período um ano antes, cortado na mesma data
+	measure 'ENE · ano anterior' =
+			VAR _Fim = [_Fim do período]
+			RETURN
+			    IF (
+			        ISFILTERED ( 'Calendário' ),
+			        CALCULATE (
+			            [Energética (ENE)],
+			            REMOVEFILTERS ( 'Calendário' ),
+			            DATEADD ( CALCULATETABLE ( VALUES ( 'Calendário'[Data] ), KEEPFILTERS ( 'Calendário'[Data] <= _Fim ) ), -1, YEAR )
+			        ),
+			        CALCULATE (
+			            [Energética (ENE)],
+			            REMOVEFILTERS ( 'Calendário' ),
+			            DATESINPERIOD ( 'Calendário'[Data], EDATE ( _Fim, -12 ), -12, MONTH )
+			        )
+			    )
+		formatString: #,0
+		displayFolder: Período
+		lineageTag: b700b417-c270-5864-8ea5-c95699a97850
+
+	/// [Confiabilidade (CNF)] no período analisado: o filtro de datas, ou os últimos 12 meses quando não há filtro
+	measure 'CNF · período' =
+			VAR _Fim = [_Fim do período]
+			RETURN
+			    IF (
+			        ISFILTERED ( 'Calendário' ),
+			        CALCULATE ( [Confiabilidade (CNF)], KEEPFILTERS ( 'Calendário'[Data] <= _Fim ) ),
+			        CALCULATE ( [Confiabilidade (CNF)], DATESINPERIOD ( 'Calendário'[Data], _Fim, -12, MONTH ) )
+			    )
+		formatString: #,0
+		displayFolder: Período
+		lineageTag: 2c007b0e-e5d7-55a4-8023-3819895319b5
+
+	/// [Confiabilidade (CNF)] no mesmo período um ano antes, cortado na mesma data
+	measure 'CNF · ano anterior' =
+			VAR _Fim = [_Fim do período]
+			RETURN
+			    IF (
+			        ISFILTERED ( 'Calendário' ),
+			        CALCULATE (
+			            [Confiabilidade (CNF)],
+			            REMOVEFILTERS ( 'Calendário' ),
+			            DATEADD ( CALCULATETABLE ( VALUES ( 'Calendário'[Data] ), KEEPFILTERS ( 'Calendário'[Data] <= _Fim ) ), -1, YEAR )
+			        ),
+			        CALCULATE (
+			            [Confiabilidade (CNF)],
+			            REMOVEFILTERS ( 'Calendário' ),
+			            DATESINPERIOD ( 'Calendário'[Data], EDATE ( _Fim, -12 ), -12, MONTH )
+			        )
+			    )
+		formatString: #,0
+		displayFolder: Período
+		lineageTag: dd274bb4-3f22-56bc-b511-fdef1a8143d0
+
+	/// [Indisponibilidade externa (REL)] no período analisado: o filtro de datas, ou os últimos 12 meses quando não há filtro
+	measure 'REL · período' =
+			VAR _Fim = [_Fim do período]
+			RETURN
+			    IF (
+			        ISFILTERED ( 'Calendário' ),
+			        CALCULATE ( [Indisponibilidade externa (REL)], KEEPFILTERS ( 'Calendário'[Data] <= _Fim ) ),
+			        CALCULATE ( [Indisponibilidade externa (REL)], DATESINPERIOD ( 'Calendário'[Data], _Fim, -12, MONTH ) )
+			    )
+		formatString: #,0
+		displayFolder: Período
+		lineageTag: 91586a38-5f19-5f1d-ada4-d351aeea4062
+
+	/// [Indisponibilidade externa (REL)] no mesmo período um ano antes, cortado na mesma data
+	measure 'REL · ano anterior' =
+			VAR _Fim = [_Fim do período]
+			RETURN
+			    IF (
+			        ISFILTERED ( 'Calendário' ),
+			        CALCULATE (
+			            [Indisponibilidade externa (REL)],
+			            REMOVEFILTERS ( 'Calendário' ),
+			            DATEADD ( CALCULATETABLE ( VALUES ( 'Calendário'[Data] ), KEEPFILTERS ( 'Calendário'[Data] <= _Fim ) ), -1, YEAR )
+			        ),
+			        CALCULATE (
+			            [Indisponibilidade externa (REL)],
+			            REMOVEFILTERS ( 'Calendário' ),
+			            DATESINPERIOD ( 'Calendário'[Data], EDATE ( _Fim, -12 ), -12, MONTH )
+			        )
+			    )
+		formatString: #,0
+		displayFolder: Período
+		lineageTag: f886dfcf-315f-58ce-a82f-1ca86c4b817b
+
+	/// [Parecer de acesso (PAR)] no período analisado: o filtro de datas, ou os últimos 12 meses quando não há filtro
+	measure 'PAR · período' =
+			VAR _Fim = [_Fim do período]
+			RETURN
+			    IF (
+			        ISFILTERED ( 'Calendário' ),
+			        CALCULATE ( [Parecer de acesso (PAR)], KEEPFILTERS ( 'Calendário'[Data] <= _Fim ) ),
+			        CALCULATE ( [Parecer de acesso (PAR)], DATESINPERIOD ( 'Calendário'[Data], _Fim, -12, MONTH ) )
+			    )
+		formatString: #,0
+		displayFolder: Período
+		lineageTag: 7e2d44f9-9602-5259-9507-fc979f35274e
+
+	/// [Parecer de acesso (PAR)] no mesmo período um ano antes, cortado na mesma data
+	measure 'PAR · ano anterior' =
+			VAR _Fim = [_Fim do período]
+			RETURN
+			    IF (
+			        ISFILTERED ( 'Calendário' ),
+			        CALCULATE (
+			            [Parecer de acesso (PAR)],
+			            REMOVEFILTERS ( 'Calendário' ),
+			            DATEADD ( CALCULATETABLE ( VALUES ( 'Calendário'[Data] ), KEEPFILTERS ( 'Calendário'[Data] <= _Fim ) ), -1, YEAR )
+			        ),
+			        CALCULATE (
+			            [Parecer de acesso (PAR)],
+			            REMOVEFILTERS ( 'Calendário' ),
+			            DATESINPERIOD ( 'Calendário'[Data], EDATE ( _Fim, -12 ), -12, MONTH )
+			        )
+			    )
+		formatString: #,0
+		displayFolder: Período
+		lineageTag: 36d03e5c-a57b-54b0-89d3-7d378805b0f0
+
+	/// [Sem razão (GWh)] no período analisado: o filtro de datas, ou os últimos 12 meses quando não há filtro
+	measure 'Sem razão · período' =
+			VAR _Fim = [_Fim do período]
+			RETURN
+			    IF (
+			        ISFILTERED ( 'Calendário' ),
+			        CALCULATE ( [Sem razão (GWh)], KEEPFILTERS ( 'Calendário'[Data] <= _Fim ) ),
+			        CALCULATE ( [Sem razão (GWh)], DATESINPERIOD ( 'Calendário'[Data], _Fim, -12, MONTH ) )
+			    )
+		formatString: #,0
+		displayFolder: Período
+		lineageTag: 89893d78-a0cc-526c-8089-0932fb6ab5c1
+
+	/// [Sem razão (GWh)] no mesmo período um ano antes, cortado na mesma data
+	measure 'Sem razão · ano anterior' =
+			VAR _Fim = [_Fim do período]
+			RETURN
+			    IF (
+			        ISFILTERED ( 'Calendário' ),
+			        CALCULATE (
+			            [Sem razão (GWh)],
+			            REMOVEFILTERS ( 'Calendário' ),
+			            DATEADD ( CALCULATETABLE ( VALUES ( 'Calendário'[Data] ), KEEPFILTERS ( 'Calendário'[Data] <= _Fim ) ), -1, YEAR )
+			        ),
+			        CALCULATE (
+			            [Sem razão (GWh)],
+			            REMOVEFILTERS ( 'Calendário' ),
+			            DATESINPERIOD ( 'Calendário'[Data], EDATE ( _Fim, -12 ), -12, MONTH )
+			        )
+			    )
+		formatString: #,0
+		displayFolder: Período
+		lineageTag: 91a49f0b-eff7-5674-a4da-a6f63d84acf8
+
+	/// [Origem local (GWh)] no período analisado: o filtro de datas, ou os últimos 12 meses quando não há filtro
+	measure 'Origem local · período' =
+			VAR _Fim = [_Fim do período]
+			RETURN
+			    IF (
+			        ISFILTERED ( 'Calendário' ),
+			        CALCULATE ( [Origem local (GWh)], KEEPFILTERS ( 'Calendário'[Data] <= _Fim ) ),
+			        CALCULATE ( [Origem local (GWh)], DATESINPERIOD ( 'Calendário'[Data], _Fim, -12, MONTH ) )
+			    )
+		formatString: #,0
+		displayFolder: Período
+		lineageTag: ba0c2c12-b9c9-51e2-b6ba-b2666cdb7321
+
+	/// [Origem local (GWh)] no mesmo período um ano antes, cortado na mesma data
+	measure 'Origem local · ano anterior' =
+			VAR _Fim = [_Fim do período]
+			RETURN
+			    IF (
+			        ISFILTERED ( 'Calendário' ),
+			        CALCULATE (
+			            [Origem local (GWh)],
+			            REMOVEFILTERS ( 'Calendário' ),
+			            DATEADD ( CALCULATETABLE ( VALUES ( 'Calendário'[Data] ), KEEPFILTERS ( 'Calendário'[Data] <= _Fim ) ), -1, YEAR )
+			        ),
+			        CALCULATE (
+			            [Origem local (GWh)],
+			            REMOVEFILTERS ( 'Calendário' ),
+			            DATESINPERIOD ( 'Calendário'[Data], EDATE ( _Fim, -12 ), -12, MONTH )
+			        )
+			    )
+		formatString: #,0
+		displayFolder: Período
+		lineageTag: 4bc0619b-a649-5a6c-a71f-89f06cd996e7
+
+	/// [Origem sistêmica (GWh)] no período analisado: o filtro de datas, ou os últimos 12 meses quando não há filtro
+	measure 'Origem sistêmica · período' =
+			VAR _Fim = [_Fim do período]
+			RETURN
+			    IF (
+			        ISFILTERED ( 'Calendário' ),
+			        CALCULATE ( [Origem sistêmica (GWh)], KEEPFILTERS ( 'Calendário'[Data] <= _Fim ) ),
+			        CALCULATE ( [Origem sistêmica (GWh)], DATESINPERIOD ( 'Calendário'[Data], _Fim, -12, MONTH ) )
+			    )
+		formatString: #,0
+		displayFolder: Período
+		lineageTag: 3921ca46-a7b1-5184-b91f-2a2d69838565
+
+	/// [Origem sistêmica (GWh)] no mesmo período um ano antes, cortado na mesma data
+	measure 'Origem sistêmica · ano anterior' =
+			VAR _Fim = [_Fim do período]
+			RETURN
+			    IF (
+			        ISFILTERED ( 'Calendário' ),
+			        CALCULATE (
+			            [Origem sistêmica (GWh)],
+			            REMOVEFILTERS ( 'Calendário' ),
+			            DATEADD ( CALCULATETABLE ( VALUES ( 'Calendário'[Data] ), KEEPFILTERS ( 'Calendário'[Data] <= _Fim ) ), -1, YEAR )
+			        ),
+			        CALCULATE (
+			            [Origem sistêmica (GWh)],
+			            REMOVEFILTERS ( 'Calendário' ),
+			            DATESINPERIOD ( 'Calendário'[Data], EDATE ( _Fim, -12 ), -12, MONTH )
+			        )
+			    )
+		formatString: #,0
+		displayFolder: Período
+		lineageTag: 32aaee2c-a09f-5723-ab2c-9eee0906462b
+
+	/// [Sem origem (GWh)] no período analisado: o filtro de datas, ou os últimos 12 meses quando não há filtro
+	measure 'Sem origem · período' =
+			VAR _Fim = [_Fim do período]
+			RETURN
+			    IF (
+			        ISFILTERED ( 'Calendário' ),
+			        CALCULATE ( [Sem origem (GWh)], KEEPFILTERS ( 'Calendário'[Data] <= _Fim ) ),
+			        CALCULATE ( [Sem origem (GWh)], DATESINPERIOD ( 'Calendário'[Data], _Fim, -12, MONTH ) )
+			    )
+		formatString: #,0
+		displayFolder: Período
+		lineageTag: 3cfbbe2b-607c-5d40-b4c7-4c7a4bd81c6d
+
+	/// [Sem origem (GWh)] no mesmo período um ano antes, cortado na mesma data
+	measure 'Sem origem · ano anterior' =
+			VAR _Fim = [_Fim do período]
+			RETURN
+			    IF (
+			        ISFILTERED ( 'Calendário' ),
+			        CALCULATE (
+			            [Sem origem (GWh)],
+			            REMOVEFILTERS ( 'Calendário' ),
+			            DATEADD ( CALCULATETABLE ( VALUES ( 'Calendário'[Data] ), KEEPFILTERS ( 'Calendário'[Data] <= _Fim ) ), -1, YEAR )
+			        ),
+			        CALCULATE (
+			            [Sem origem (GWh)],
+			            REMOVEFILTERS ( 'Calendário' ),
+			            DATESINPERIOD ( 'Calendário'[Data], EDATE ( _Fim, -12 ), -12, MONTH )
+			        )
+			    )
+		formatString: #,0
+		displayFolder: Período
+		lineageTag: 8d8e6799-8f0f-57db-8912-f9442d3d0baf
+
+	measure '% cortado · período' = DIVIDE([Não realizada · período], [Geração · período] + [Não realizada · período])
+		formatString: 0.0%
+		displayFolder: Período
+		lineageTag: a9b32c2a-3ad4-5c4d-af3a-e4eb1105a1c1
+
+	measure '% cortado · ano anterior' = DIVIDE([Não realizada · ano anterior], [Geração · ano anterior] + [Não realizada · ano anterior])
+		formatString: 0.0%
+		displayFolder: Período
+		lineageTag: acc227e7-24f4-5a8c-963a-7a32d6638bed
+
+	measure 'Não realizada · var %' =
+			VAR _A = [Não realizada · período]
+			VAR _B = [Não realizada · ano anterior]
+			RETURN
+			    IF ( NOT ISBLANK ( _B ) && _B <> 0, DIVIDE ( _A - _B, _B ) )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: Período
+		lineageTag: cb747720-eb1a-5237-b3c1-fc317407f347
+
+	measure 'Geração · var %' =
+			VAR _A = [Geração · período]
+			VAR _B = [Geração · ano anterior]
+			RETURN
+			    IF ( NOT ISBLANK ( _B ) && _B <> 0, DIVIDE ( _A - _B, _B ) )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: Período
+		lineageTag: c8b2da6d-1764-5946-9f4e-9f3e0858c212
+
+	measure 'Usinas com corte · var %' =
+			VAR _A = [Usinas com corte · período]
+			VAR _B = [Usinas com corte · ano anterior]
+			RETURN
+			    IF ( NOT ISBLANK ( _B ) && _B <> 0, DIVIDE ( _A - _B, _B ) )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: Período
+		lineageTag: 129868c7-a00b-5615-bffe-ca04155f3afd
+
+	/// Variação do percentual cortado em pontos percentuais
+	measure '% cortado · var p.p.' =
+			VAR _A = [% cortado · período]
+			VAR _B = [% cortado · ano anterior]
+			RETURN
+			    IF ( NOT ISBLANK ( _B ), ( _A - _B ) * 100 )
+		formatString: +0.0;-0.0;0.0
+		displayFolder: Período
+		lineageTag: 14fd2685-52c3-5a9a-b172-4eac4c613b39
+
+	measure 'Início do período' =
+			VAR _Fim = [_Fim do período]
+			RETURN
+			    IF ( ISFILTERED ( 'Calendário' ), MIN ( 'Calendário'[Data] ), EDATE ( _Fim, -12 ) + 1 )
+		formatString: dd/mm/yyyy
+		isHidden
+		displayFolder: Período
+		lineageTag: 88c30229-74e5-5694-bed4-81664be8ca1f
+
+	measure 'Rótulo do período' =
+			VAR _Fim = [_Fim do período]
+			VAR _Ini = [Início do período]
+			RETURN
+			    IF (
+			        ISFILTERED ( 'Calendário' ),
+			        FORMAT ( _Ini, "dd/mm/yyyy" ) & " a " & FORMAT ( _Fim, "dd/mm/yyyy" ) & " · comparado ao mesmo período do ano anterior",
+			        "Últimos 12 meses (" & FORMAT ( _Ini, "mmm/yy" ) & " a " & FORMAT ( _Fim, "mmm/yy" ) & ") · comparado aos 12 meses anteriores"
+			    )
+		displayFolder: Período
+		lineageTag: 8f1c96e8-2cef-5bae-bd2f-f0cb63e0e3c6
+
+	/// Sparkline de 24 meses (SVG) de [Não realizada (GWh)]
+	measure 'svg · sparkline não realizada' =
+			VAR _Fim = [_Fim do período]
+			VAR _Ini = EOMONTH ( _Fim, -24 ) + 1
+			VAR _Meses =
+			    ADDCOLUMNS (
+			        CALCULATETABLE ( VALUES ( 'Calendário'[Mês] ), REMOVEFILTERS ( 'Calendário' ), DATESBETWEEN ( 'Calendário'[Data], _Ini, _Fim ) ),
+			        "@v", VAR _m = 'Calendário'[Mês] RETURN CALCULATE ( [Não realizada (GWh)], REMOVEFILTERS ( 'Calendário' ), 'Calendário'[Mês] = _m )
+			    )
+			VAR _Min = MINX ( _Meses, [@v] )
+			VAR _Max = MAXX ( _Meses, [@v] )
+			VAR _N = COUNTROWS ( _Meses )
+			VAR _I = ADDCOLUMNS ( _Meses, "@i", RANKX ( _Meses, 'Calendário'[Mês], , ASC, DENSE ) )
+			VAR _C =
+			    ADDCOLUMNS (
+			        _I,
+			        "@x", DIVIDE ( [@i] - 1, _N - 1 ) * 112 + 4,
+			        "@y", 32 - DIVIDE ( [@v] - _Min, _Max - _Min ) * 28
+			    )
+			VAR _P = CONCATENATEX ( _C, FORMAT ( [@x], "0.0", "en-US" ) & "," & FORMAT ( [@y], "0.0", "en-US" ), " ", [@i], ASC )
+			VAR _U = TOPN ( 1, _C, [@i], DESC )
+			VAR _UX = FORMAT ( MAXX ( _U, [@x] ), "0.0", "en-US" )
+			VAR _UY = FORMAT ( MAXX ( _U, [@y] ), "0.0", "en-US" )
+			VAR _Parcial = _Fim < EOMONTH ( _Fim, 0 )
+			RETURN
+			    IF (
+			        _N >= 2,
+			        "<svg width='120' height='36' viewBox='0 0 120 36'><polyline points='" & _P
+			            & "' fill='none' stroke='#8A8886' stroke-width='1.6' stroke-linejoin='round'/><circle cx='" & _UX & "' cy='" & _UY
+			            & "' r='3' " & IF ( _Parcial, "fill='#FFFFFF' stroke='#967100' stroke-width='1.5'", "fill='#F2C811'" ) & "/></svg>"
+			    )
+		isHidden
+		displayFolder: Visual
+		lineageTag: 32c859ff-5b8d-58c0-983a-cb054b70c4d1
+
+	/// Sparkline de 24 meses (SVG) de [% cortado]
+	measure 'svg · sparkline % cortado' =
+			VAR _Fim = [_Fim do período]
+			VAR _Ini = EOMONTH ( _Fim, -24 ) + 1
+			VAR _Meses =
+			    ADDCOLUMNS (
+			        CALCULATETABLE ( VALUES ( 'Calendário'[Mês] ), REMOVEFILTERS ( 'Calendário' ), DATESBETWEEN ( 'Calendário'[Data], _Ini, _Fim ) ),
+			        "@v", VAR _m = 'Calendário'[Mês] RETURN CALCULATE ( [% cortado], REMOVEFILTERS ( 'Calendário' ), 'Calendário'[Mês] = _m )
+			    )
+			VAR _Min = MINX ( _Meses, [@v] )
+			VAR _Max = MAXX ( _Meses, [@v] )
+			VAR _N = COUNTROWS ( _Meses )
+			VAR _I = ADDCOLUMNS ( _Meses, "@i", RANKX ( _Meses, 'Calendário'[Mês], , ASC, DENSE ) )
+			VAR _C =
+			    ADDCOLUMNS (
+			        _I,
+			        "@x", DIVIDE ( [@i] - 1, _N - 1 ) * 112 + 4,
+			        "@y", 32 - DIVIDE ( [@v] - _Min, _Max - _Min ) * 28
+			    )
+			VAR _P = CONCATENATEX ( _C, FORMAT ( [@x], "0.0", "en-US" ) & "," & FORMAT ( [@y], "0.0", "en-US" ), " ", [@i], ASC )
+			VAR _U = TOPN ( 1, _C, [@i], DESC )
+			VAR _UX = FORMAT ( MAXX ( _U, [@x] ), "0.0", "en-US" )
+			VAR _UY = FORMAT ( MAXX ( _U, [@y] ), "0.0", "en-US" )
+			VAR _Parcial = _Fim < EOMONTH ( _Fim, 0 )
+			RETURN
+			    IF (
+			        _N >= 2,
+			        "<svg width='120' height='36' viewBox='0 0 120 36'><polyline points='" & _P
+			            & "' fill='none' stroke='#8A8886' stroke-width='1.6' stroke-linejoin='round'/><circle cx='" & _UX & "' cy='" & _UY
+			            & "' r='3' " & IF ( _Parcial, "fill='#FFFFFF' stroke='#967100' stroke-width='1.5'", "fill='#F2C811'" ) & "/></svg>"
+			    )
+		isHidden
+		displayFolder: Visual
+		lineageTag: aa733a74-8f05-597d-84bc-3d4312c2f1e8
+
+	/// Sparkline de 24 meses (SVG) de [Geração (GWh)]
+	measure 'svg · sparkline geração' =
+			VAR _Fim = [_Fim do período]
+			VAR _Ini = EOMONTH ( _Fim, -24 ) + 1
+			VAR _Meses =
+			    ADDCOLUMNS (
+			        CALCULATETABLE ( VALUES ( 'Calendário'[Mês] ), REMOVEFILTERS ( 'Calendário' ), DATESBETWEEN ( 'Calendário'[Data], _Ini, _Fim ) ),
+			        "@v", VAR _m = 'Calendário'[Mês] RETURN CALCULATE ( [Geração (GWh)], REMOVEFILTERS ( 'Calendário' ), 'Calendário'[Mês] = _m )
+			    )
+			VAR _Min = MINX ( _Meses, [@v] )
+			VAR _Max = MAXX ( _Meses, [@v] )
+			VAR _N = COUNTROWS ( _Meses )
+			VAR _I = ADDCOLUMNS ( _Meses, "@i", RANKX ( _Meses, 'Calendário'[Mês], , ASC, DENSE ) )
+			VAR _C =
+			    ADDCOLUMNS (
+			        _I,
+			        "@x", DIVIDE ( [@i] - 1, _N - 1 ) * 112 + 4,
+			        "@y", 32 - DIVIDE ( [@v] - _Min, _Max - _Min ) * 28
+			    )
+			VAR _P = CONCATENATEX ( _C, FORMAT ( [@x], "0.0", "en-US" ) & "," & FORMAT ( [@y], "0.0", "en-US" ), " ", [@i], ASC )
+			VAR _U = TOPN ( 1, _C, [@i], DESC )
+			VAR _UX = FORMAT ( MAXX ( _U, [@x] ), "0.0", "en-US" )
+			VAR _UY = FORMAT ( MAXX ( _U, [@y] ), "0.0", "en-US" )
+			VAR _Parcial = _Fim < EOMONTH ( _Fim, 0 )
+			RETURN
+			    IF (
+			        _N >= 2,
+			        "<svg width='120' height='36' viewBox='0 0 120 36'><polyline points='" & _P
+			            & "' fill='none' stroke='#8A8886' stroke-width='1.6' stroke-linejoin='round'/><circle cx='" & _UX & "' cy='" & _UY
+			            & "' r='3' " & IF ( _Parcial, "fill='#FFFFFF' stroke='#967100' stroke-width='1.5'", "fill='#F2C811'" ) & "/></svg>"
+			    )
+		isHidden
+		displayFolder: Visual
+		lineageTag: ecc36b75-9e63-57fe-8309-8f3cf1f3e2f5
+
+	/// Sparkline de 24 meses (SVG) de [Usinas com corte]
+	measure 'svg · sparkline usinas' =
+			VAR _Fim = [_Fim do período]
+			VAR _Ini = EOMONTH ( _Fim, -24 ) + 1
+			VAR _Meses =
+			    ADDCOLUMNS (
+			        CALCULATETABLE ( VALUES ( 'Calendário'[Mês] ), REMOVEFILTERS ( 'Calendário' ), DATESBETWEEN ( 'Calendário'[Data], _Ini, _Fim ) ),
+			        "@v", VAR _m = 'Calendário'[Mês] RETURN CALCULATE ( [Usinas com corte], REMOVEFILTERS ( 'Calendário' ), 'Calendário'[Mês] = _m )
+			    )
+			VAR _Min = MINX ( _Meses, [@v] )
+			VAR _Max = MAXX ( _Meses, [@v] )
+			VAR _N = COUNTROWS ( _Meses )
+			VAR _I = ADDCOLUMNS ( _Meses, "@i", RANKX ( _Meses, 'Calendário'[Mês], , ASC, DENSE ) )
+			VAR _C =
+			    ADDCOLUMNS (
+			        _I,
+			        "@x", DIVIDE ( [@i] - 1, _N - 1 ) * 112 + 4,
+			        "@y", 32 - DIVIDE ( [@v] - _Min, _Max - _Min ) * 28
+			    )
+			VAR _P = CONCATENATEX ( _C, FORMAT ( [@x], "0.0", "en-US" ) & "," & FORMAT ( [@y], "0.0", "en-US" ), " ", [@i], ASC )
+			VAR _U = TOPN ( 1, _C, [@i], DESC )
+			VAR _UX = FORMAT ( MAXX ( _U, [@x] ), "0.0", "en-US" )
+			VAR _UY = FORMAT ( MAXX ( _U, [@y] ), "0.0", "en-US" )
+			VAR _Parcial = _Fim < EOMONTH ( _Fim, 0 )
+			RETURN
+			    IF (
+			        _N >= 2,
+			        "<svg width='120' height='36' viewBox='0 0 120 36'><polyline points='" & _P
+			            & "' fill='none' stroke='#8A8886' stroke-width='1.6' stroke-linejoin='round'/><circle cx='" & _UX & "' cy='" & _UY
+			            & "' r='3' " & IF ( _Parcial, "fill='#FFFFFF' stroke='#967100' stroke-width='1.5'", "fill='#F2C811'" ) & "/></svg>"
+			    )
+		isHidden
+		displayFolder: Visual
+		lineageTag: 32da4883-3f49-53fc-b9e2-566bb17983a3
+
+	/// Faixa de KPIs da página executiva (HTML Content)
+	measure 'html · KPIs' =
+			VAR _Cmp = IF ( ISFILTERED ( 'Calendário' ), "vs mesmo período do ano anterior", "vs 12 meses anteriores" )
+			RETURN
+			    "<div class='cab'><span class='per'>" & [Rótulo do período] & "</span><span class='dt'>Dados até " & FORMAT ( [Última data com dados], "dd/mm/yyyy" ) & " · tendência de 24 meses à direita</span></div><div class='kpis'>"
+			        &     "<div class='card'><div class='rot'>Geração não realizada</div><div class='lin'><div><div class='val'>" & FORMAT ( [Não realizada · período], "#,0" ) & "<span class='un'> GWh</span></div>"
+			        & ( VAR _V1 = [Não realizada · var %] RETURN IF ( ISBLANK ( _V1 ), "<div class='var neu'>sem base de comparação</div>",
+			            "<div class='var " & IF ( _V1 > 0, "ruim", "bom" ) & "'>" & IF ( _V1 > 0, "▲ ", "▼ " ) & FORMAT ( ABS ( _V1 ), "0.0%" ) & "</div>" ) )
+			        & "</div><div class='spk'>" & [svg · sparkline não realizada] & "</div></div></div>"
+			        &     "<div class='card'><div class='rot'>% da geração possível cortada</div><div class='lin'><div><div class='val'>" & FORMAT ( [% cortado · período], "0.0%" ) & "<span class='un'></span></div>"
+			        & ( VAR _V2 = [% cortado · var p.p.] RETURN IF ( ISBLANK ( _V2 ), "<div class='var neu'>sem base de comparação</div>",
+			            "<div class='var " & IF ( _V2 > 0, "ruim", "bom" ) & "'>" & IF ( _V2 > 0, "▲ ", "▼ " ) & FORMAT ( ABS ( _V2 ), "0.0" ) & " p.p." & "</div>" ) )
+			        & "</div><div class='spk'>" & [svg · sparkline % cortado] & "</div></div></div>"
+			        &     "<div class='card'><div class='rot'>Geração verificada</div><div class='lin'><div><div class='val'>" & FORMAT ( [Geração · período], "#,0" ) & "<span class='un'> GWh</span></div>"
+			        & ( VAR _V3 = [Geração · var %] RETURN IF ( ISBLANK ( _V3 ), "<div class='var neu'>sem base de comparação</div>",
+			            "<div class='var " & IF ( _V3 < 0, "ruim", "bom" ) & "'>" & IF ( _V3 > 0, "▲ ", "▼ " ) & FORMAT ( ABS ( _V3 ), "0.0%" ) & "</div>" ) )
+			        & "</div><div class='spk'>" & [svg · sparkline geração] & "</div></div></div>"
+			        &     "<div class='card'><div class='rot'>Usinas e conjuntos com corte</div><div class='lin'><div><div class='val'>" & FORMAT ( [Usinas com corte · período], "#,0" ) & "<span class='un'></span></div>"
+			        & ( VAR _V4 = [Usinas com corte · var %] RETURN IF ( ISBLANK ( _V4 ), "<div class='var neu'>sem base de comparação</div>",
+			            "<div class='var " & IF ( _V4 > 0, "ruim", "bom" ) & "'>" & IF ( _V4 > 0, "▲ ", "▼ " ) & FORMAT ( ABS ( _V4 ), "0.0%" ) & "</div>" ) )
+			        & "</div><div class='spk'>" & [svg · sparkline usinas] & "</div></div></div>"
+			        & "</div><div class='leg'>Variações " & _Cmp & ". Para cortes, alta é desfavorável (▲ em vermelho).</div>"
+		isHidden
+		displayFolder: Visual
+		lineageTag: 300ebd8f-c2e6-54c5-ab6c-4660956d1bc6
+
+	/// Painel de destaques da página executiva (HTML Content)
+	measure 'html · Destaques' =
+			VAR _T = [Não realizada · período]
+			VAR _Razoes =
+			    { ( "energética (ENE)", [ENE · período] ), ( "confiabilidade elétrica (CNF)", [CNF · período] ),
+			      ( "indisponibilidade externa (REL)", [REL · período] ), ( "parecer de acesso (PAR)", [PAR · período] ) }
+			VAR _RTop = TOPN ( 1, _Razoes, [Value2], DESC )
+			VAR _RNome = MAXX ( _RTop, [Value1] )
+			VAR _RPct = DIVIDE ( MAXX ( _RTop, [Value2] ), _T )
+			VAR _Sis = DIVIDE ( [Origem sistêmica · período], _T )
+			VAR _Est = TOPN ( 1, ADDCOLUMNS ( VALUES ( 'Estados'[Estado] ), "@v", [Não realizada · período] ), [@v], DESC )
+			VAR _EstNome = MAXX ( _Est, 'Estados'[Estado] )
+			VAR _EstPct = DIVIDE ( MAXX ( _Est, [@v] ), _T )
+			VAR _Us = TOPN ( 1, ADDCOLUMNS ( VALUES ( 'Usinas'[Usina] ), "@v", [Não realizada · período] ), [@v], DESC )
+			VAR _UsNome = MAXX ( _Us, 'Usinas'[Usina] )
+			VAR _UsGWh = MAXX ( _Us, [@v] )
+			VAR _Ini = [Início do período]
+			VAR _Fim = [_Fim do período]
+			VAR _Mes =
+			    TOPN ( 1,
+			        ADDCOLUMNS (
+			            CALCULATETABLE ( VALUES ( 'Calendário'[Mês] ), REMOVEFILTERS ( 'Calendário' ), DATESBETWEEN ( 'Calendário'[Data], _Ini, _Fim ) ),
+			            "@v", VAR _m = 'Calendário'[Mês] RETURN CALCULATE ( [Não realizada (GWh)], REMOVEFILTERS ( 'Calendário' ), 'Calendário'[Mês] = _m )
+			        ), [@v], DESC )
+			VAR _MesNome = FORMAT ( MAXX ( _Mes, 'Calendário'[Mês] ), "mmmm/yyyy" )
+			VAR _MesGWh = MAXX ( _Mes, [@v] )
+			RETURN
+			    IF ( ISBLANK ( _T ) || _T = 0, "<div class='vazio'>Sem geração não realizada no período e filtros selecionados.</div>",
+			    "<div class='tit'>" & IF ( ISFILTERED ( 'Calendário' ), "Destaques do período filtrado", "Destaques dos últimos 12 meses" ) & "</div><ul>"
+			        & "<li><b>" & FORMAT ( _RPct, "0%" ) & "</b> do corte teve razão <b>" & _RNome & "</b>.</li>"
+			        & IF ( NOT ISBLANK ( _Sis ), "<li><b>" & FORMAT ( _Sis, "0%" ) & "</b> veio de restrições <b>sistêmicas</b>, e não da rede local da usina.</li>" )
+			        & "<li><b>" & _EstNome & "</b> concentrou <b>" & FORMAT ( _EstPct, "0%" ) & "</b> da energia cortada.</li>"
+			        & "<li>Maior corte individual: <b>" & _UsNome & "</b>, com " & FORMAT ( _UsGWh, "#,0" ) & " GWh.</li>"
+			        & "<li>Mês com mais corte: <b>" & _MesNome & "</b> (" & FORMAT ( _MesGWh, "#,0" ) & " GWh).</li>"
+			        & "</ul><div class='nota'>Mesmo período dos cartões, com os filtros selecionados. Associação não implica causa.</div>" )
+		isHidden
+		displayFolder: Visual
+		lineageTag: 7c78beb5-7c4d-5937-afe2-dbe7762f70f2
+
+	/// Dias com alguma geração não realizada
+	measure 'Dias com corte' = CALCULATE(DISTINCTCOUNT('Restrição diária'[dia]), 'Restrição diária'[nao_realizada_mwh] > 0)
+		formatString: #,0
+		displayFolder: Base
+		lineageTag: e01df476-36b7-5869-a2a4-2511f639df66
+
+	/// Média de horas com restrição em cada dia de cada usina com corte
+	measure 'Horas por dia com corte' = DIVIDE([Horas de restrição], CALCULATE(COUNTROWS('Restrição diária'), 'Restrição diária'[nao_realizada_mwh] > 0))
+		formatString: 0.0
+		displayFolder: Base
+		lineageTag: de9849d0-5120-5bbc-87a5-c4865c492585
+
+	/// Concentração do corte por ponto de conexão e por usina (HTML Content)
+	measure 'html · Concentração' =
+			VAR _P = FILTER ( ADDCOLUMNS ( VALUES ( 'Usinas'[Ponto de conexão] ), "@v", [Não realizada (GWh)] ), [@v] > 0 )
+			VAR _PT = SUMX ( _P, [@v] )
+			VAR _PN = COUNTROWS ( _P )
+			VAR _P80 = COUNTROWS ( FILTER ( _P, VAR _x = [@v] RETURN SUMX ( FILTER ( _P, [@v] > _x ), [@v] ) < 0.8 * _PT ) )
+			VAR _U = FILTER ( ADDCOLUMNS ( VALUES ( 'Usinas'[ID da usina] ), "@v", [Não realizada (GWh)] ), [@v] > 0 )
+			VAR _UT = SUMX ( _U, [@v] )
+			VAR _UN = COUNTROWS ( _U )
+			VAR _U80 = COUNTROWS ( FILTER ( _U, VAR _x = [@v] RETURN SUMX ( FILTER ( _U, [@v] > _x ), [@v] ) < 0.8 * _UT ) )
+			VAR _Top = TOPN ( 1, _P, [@v], DESC )
+			VAR _TopNome = MAXX ( _Top, 'Usinas'[Ponto de conexão] )
+			VAR _TopPct = DIVIDE ( MAXX ( _Top, [@v] ), _PT )
+			RETURN
+			    IF ( ISBLANK ( _PT ), "<div class='vazio'>Sem geração não realizada nos filtros selecionados.</div>",
+			    "<div class='tit'>Concentração do corte</div>"
+			        & "<div class='st'><div class='n'>" & _P80 & "<span> de " & _PN & "</span></div><div class='d'>pontos de conexão somam 80% da energia cortada</div></div>"
+			        & "<div class='st'><div class='n'>" & _U80 & "<span> de " & _UN & "</span></div><div class='d'>usinas e conjuntos somam 80% da energia cortada</div></div>"
+			        & "<div class='top'>Maior ponto: <b>" & _TopNome & "</b>, com " & FORMAT ( _TopPct, "0%" ) & " do total.</div>" )
+		isHidden
+		displayFolder: Visual
+		lineageTag: fdfd74b5-4dc2-5996-aeba-c0974ae4ba5e
+
+	/// Ficha da usina selecionada (HTML Content)
+	measure 'html · Usina' =
+			VAR _N = DISTINCTCOUNT ( 'Usinas'[ID da usina] )
+			VAR _Razoes =
+			    { ( "Energética (ENE)", [Energética (ENE)] ), ( "Confiabilidade (CNF)", [Confiabilidade (CNF)] ),
+			      ( "Indisponibilidade externa (REL)", [Indisponibilidade externa (REL)] ), ( "Parecer de acesso (PAR)", [Parecer de acesso (PAR)] ) }
+			VAR _RTop = MAXX ( TOPN ( 1, _Razoes, [Value2], DESC ), [Value1] )
+			VAR _Cab =
+			    IF ( _N = 1,
+			        "<div class='k'>" & SELECTEDVALUE ( 'Usinas'[Fonte] ) & " · " & SELECTEDVALUE ( 'Usinas'[Estado] ) & IF ( SELECTEDVALUE ( 'Usinas'[Conjunto de usinas] ), " · conjunto de usinas", "" ) & "</div>"
+			            & "<div class='nm'>" & SELECTEDVALUE ( 'Usinas'[Usina] ) & "</div>"
+			            & "<div class='at'><span><b>Agente</b> " & SELECTEDVALUE ( 'Usinas'[Agente operador] ) & "</span><span><b>Ponto de conexão</b> " & SELECTEDVALUE ( 'Usinas'[Ponto de conexão] ) & "</span>"
+			            & "<span><b>CEG</b> " & COALESCE ( SELECTEDVALUE ( 'Usinas'[CEG] ), "—" ) & "</span><span><b>Nos dados</b> " & FORMAT ( SELECTEDVALUE ( 'Usinas'[Primeiro dia] ), "mm/yyyy" ) & " a " & FORMAT ( SELECTEDVALUE ( 'Usinas'[Último dia] ), "mm/yyyy" ) & "</span></div>",
+			        "<div class='k'>Nenhuma usina selecionada</div><div class='nm'>Todas as " & FORMAT ( _N, "#,0" ) & " usinas e conjuntos</div><div class='at'><span>Abra <b>Filtros</b> e escolha a usina para ver a ficha dela.</span></div>" )
+			RETURN
+			    "<div class='wrap'><div class='cab'>" & _Cab & "</div><div class='kp'>"
+			        & "<div class='c'><div class='r'>Não realizada</div><div class='v'>" & FORMAT ( [Não realizada (GWh)], "#,0" ) & "<small> GWh</small></div></div>"
+			        & "<div class='c'><div class='r'>% cortado</div><div class='v'>" & FORMAT ( [% cortado], "0.0%" ) & "</div></div>"
+			        & "<div class='c'><div class='r'>Dias com corte</div><div class='v'>" & FORMAT ( [Dias com corte], "#,0" ) & "</div></div>"
+			        & "<div class='c'><div class='r'>Horas por dia com corte</div><div class='v'>" & FORMAT ( [Horas por dia com corte], "0.0" ) & "<small> h</small></div></div>"
+			        & "<div class='c'><div class='r'>Razão principal</div><div class='v t'>" & COALESCE ( _RTop, "—" ) & "</div></div>"
+			        & "</div></div>"
+		isHidden
+		displayFolder: Visual
+		lineageTag: 4a2506ea-d0d1-52c7-9c33-17ded42361d3
+
+	/// Geração não realizada das 10 usinas com mais corte; vazio para as demais (ordena e limita o ranking)
+	measure 'Ranking · valor' =
+			VAR _v = [Não realizada (GWh)]
+			VAR _Tab = FILTER ( ADDCOLUMNS ( ALLSELECTED ( 'Usinas'[ID da usina] ), "@v", [Não realizada (GWh)] ), [@v] > 0 )
+			VAR _r = COUNTROWS ( FILTER ( _Tab, [@v] > _v ) ) + 1
+			RETURN IF ( HASONEVALUE ( 'Usinas'[ID da usina] ) && _v > 0 && _r <= 10, _v )
+		formatString: #,0
+		isHidden
+		displayFolder: Visual
+		lineageTag: 6ed9bb6c-297d-583b-a701-a58d9c1df562
+
+	/// Uma linha do ranking das 10 usinas com mais corte (HTML Content com a usina no Contexto)
+	measure 'html · Linha ranking' =
+			VAR _v = [Não realizada (GWh)]
+			VAR _Tab = FILTER ( ADDCOLUMNS ( ALLSELECTED ( 'Usinas'[ID da usina] ), "@v", [Não realizada (GWh)] ), [@v] > 0 )
+			VAR _r = COUNTROWS ( FILTER ( _Tab, [@v] > _v ) ) + 1
+			VAR _Max = MAXX ( _Tab, [@v] )
+			VAR _meta = SELECTEDVALUE ( 'Usinas'[Fonte] ) & " · " & SELECTEDVALUE ( 'Usinas'[UF] ) & " · " & SELECTEDVALUE ( 'Usinas'[Agente operador] )
+			VAR _cab = "<div class='lin cab'><div></div><div>Usina ou conjunto</div><div class='dir'>Não realizada</div><div class='dir'>% cortado</div><div>24 meses</div></div>"
+			RETURN
+			    IF ( HASONEVALUE ( 'Usinas'[ID da usina] ) && _v > 0 && _r <= 10,
+			        IF ( _r = 1, _cab, "" )
+			            & "<div class='lin" & IF ( _r = 1, " top", "" ) & "'><div class='r'>" & _r & "</div>"
+			            & "<div><div class='nm'>" & SELECTEDVALUE ( 'Usinas'[Usina] ) & "</div><div class='mt'>" & _meta & "</div></div>"
+			            & "<div class='dir'><div class='vl'>" & FORMAT ( _v, "#,0" ) & " GWh</div><div class='bar'><span style='width:" & FORMAT ( DIVIDE ( _v, _Max ) * 100, "0", "en-US" ) & "%'></span></div></div>"
+			            & "<div class='dir pc'>" & FORMAT ( [% cortado], "0.0%" ) & "</div><div class='sp'>" & [svg · sparkline não realizada] & "</div></div>" )
+		isHidden
+		displayFolder: Visual
+		lineageTag: c965feca-608d-5964-9408-b24c02b44585
+
+	/// Dica de ferramenta do mês (HTML Content)
+	measure 'html · Dica mês' =
+			VAR _Mes = MAX ( 'Calendário'[Mês] )
+			VAR _Ult = [Última data com dados]
+			VAR _Fonte = IF ( HASONEVALUE ( 'Fontes'[Fonte] ), " · " & VALUES ( 'Fontes'[Fonte] ), "" )
+			VAR _NR = [Não realizada (GWh)]
+			VAR _AA = CALCULATE ( [Não realizada (GWh)], SAMEPERIODLASTYEAR ( 'Calendário'[Data] ) )
+			VAR _Var = IF ( NOT ISBLANK ( _AA ) && _AA <> 0, DIVIDE ( _NR - _AA, _AA ) )
+			VAR _Tab =
+			    ADDCOLUMNS (
+			        CALCULATETABLE ( VALUES ( 'Calendário'[Mês] ), REMOVEFILTERS ( 'Calendário' ) ),
+			        "@v", VAR _m = 'Calendário'[Mês] RETURN CALCULATE ( [Não realizada (GWh)], REMOVEFILTERS ( 'Calendário' ), 'Calendário'[Mês] = _m )
+			    )
+			VAR _Rank = COUNTROWS ( FILTER ( _Tab, [@v] > _NR ) ) + 1
+			VAR _N = COUNTROWS ( FILTER ( _Tab, NOT ISBLANK ( [@v] ) ) )
+			VAR _Est = TOPN ( 1, ADDCOLUMNS ( VALUES ( 'Estados'[Estado] ), "@v", [Não realizada (GWh)] ), [@v], DESC )
+			VAR _Parcial = _Mes <= _Ult && EOMONTH ( _Mes, 0 ) > _Ult
+			VAR _T = [Não realizada (GWh)]
+			VAR _E = DIVIDE ( [Energética (ENE)], _T )
+			VAR _C = DIVIDE ( [Confiabilidade (CNF)], _T )
+			VAR _R = DIVIDE ( [Indisponibilidade externa (REL)], _T )
+			VAR _P = DIVIDE ( [Parecer de acesso (PAR)], _T )
+			VAR _Seg = ( VAR p = _E RETURN "<span style='width:" & FORMAT ( p * 100, "0.0", "en-US" ) & "%;background:#FFFFFF'></span>" )
+			    & ( VAR p = _C RETURN "<span style='width:" & FORMAT ( p * 100, "0.0", "en-US" ) & "%;background:#A19F9D'></span>" )
+			    & ( VAR p = _R RETURN "<span style='width:" & FORMAT ( p * 100, "0.0", "en-US" ) & "%;background:#605E5C'></span>" )
+			    & ( VAR p = _P RETURN "<span style='width:" & FORMAT ( p * 100, "0.0", "en-US" ) & "%;background:#F2C811'></span>" )
+			VAR _Leg = "ENE " & FORMAT ( _E, "0%" ) & " · CNF " & FORMAT ( _C, "0%" ) & " · REL " & FORMAT ( _R, "0%" ) & IF ( _P >= 0.005, " · PAR " & FORMAT ( _P, "0%" ) )
+			VAR _BlocoRazoes = "<div class='sec'>Razão do corte</div><div class='bar'>" & _Seg & "</div><div class='leg'>" & _Leg & "</div>"
+			RETURN
+			    IF ( ISBLANK ( _NR ) || _NR = 0, "<div class='tt'><div class='k'>Mês</div><div class='t'>" & FORMAT ( _Mes, "mmmm/yyyy" ) & _Fonte & "</div><div class='c'>Sem geração não realizada neste mês.</div></div>",
+			    "<div class='tt'><div class='k'>Mês</div><div class='t'>" & FORMAT ( _Mes, "mmmm/yyyy" ) & _Fonte & "</div>"
+			        & "<div class='g'><div><div class='v'>" & FORMAT ( _NR, "#,0" ) & "<small> GWh</small></div><div class='l'>não gerados</div></div>"
+			        & "<div><div class='v'>" & FORMAT ( [% cortado], "0.0%" ) & "</div><div class='l'>da geração possível</div></div></div>"
+			        & "<div class='c'>" & IF ( ISBLANK ( _Var ), "Sem base no mesmo mês do ano anterior", "<b class='" & IF ( _Var > 0, "ruim", "bom" ) & "'>" & IF ( _Var > 0, "▲ ", "▼ " ) & FORMAT ( ABS ( _Var ), "0%" ) & "</b> vs " & FORMAT ( EDATE ( _Mes, -12 ), "mmm/yyyy" ) )
+			        & " · <b>" & _Rank & "º</b> maior de " & _N & " meses</div>"
+			        & _BlocoRazoes
+			        & "<div class='f'>Mais corte: <b>" & MAXX ( _Est, 'Estados'[Estado] ) & "</b> (" & FORMAT ( DIVIDE ( MAXX ( _Est, [@v] ), _NR ), "0%" ) & " do mês)</div>"
+			        & IF ( _Parcial, "<div class='n'>Mês incompleto: dados até " & FORMAT ( _Ult, "dd/mm/yyyy" ) & "</div>" )
+			        & "</div>" )
+		isHidden
+		displayFolder: Dicas
+		lineageTag: 6f36cb78-584a-5e51-adb6-2a1729ceb8ba
+
+	/// Dica de ferramenta do estado (HTML Content)
+	measure 'html · Dica estado' =
+			VAR _Nome = SELECTEDVALUE ( 'Estados'[Estado] )
+			VAR _NR = [Não realizada (GWh)]
+			VAR _Pct = [% cortado]
+			VAR _Tot = CALCULATE ( [Não realizada (GWh)], REMOVEFILTERS ( 'Estados' ) )
+			VAR _Tab =
+			    FILTER (
+			        ADDCOLUMNS ( CALCULATETABLE ( VALUES ( 'Estados'[Estado] ), REMOVEFILTERS ( 'Estados' ) ),
+			            "@p", VAR _e = 'Estados'[Estado] RETURN CALCULATE ( [% cortado], REMOVEFILTERS ( 'Estados' ), 'Estados'[Estado] = _e ) ),
+			        NOT ISBLANK ( [@p] ) )
+			VAR _Rank = COUNTROWS ( FILTER ( _Tab, [@p] > _Pct ) ) + 1
+			VAR _Us = TOPN ( 1, ADDCOLUMNS ( VALUES ( 'Usinas'[Usina] ), "@v", [Não realizada (GWh)] ), [@v], DESC )
+			VAR _Pt = TOPN ( 1, ADDCOLUMNS ( VALUES ( 'Usinas'[Ponto de conexão] ), "@v", [Não realizada (GWh)] ), [@v], DESC )
+			VAR _T = [Não realizada (GWh)]
+			VAR _E = DIVIDE ( [Energética (ENE)], _T )
+			VAR _C = DIVIDE ( [Confiabilidade (CNF)], _T )
+			VAR _R = DIVIDE ( [Indisponibilidade externa (REL)], _T )
+			VAR _P = DIVIDE ( [Parecer de acesso (PAR)], _T )
+			VAR _Seg = ( VAR p = _E RETURN "<span style='width:" & FORMAT ( p * 100, "0.0", "en-US" ) & "%;background:#FFFFFF'></span>" )
+			    & ( VAR p = _C RETURN "<span style='width:" & FORMAT ( p * 100, "0.0", "en-US" ) & "%;background:#A19F9D'></span>" )
+			    & ( VAR p = _R RETURN "<span style='width:" & FORMAT ( p * 100, "0.0", "en-US" ) & "%;background:#605E5C'></span>" )
+			    & ( VAR p = _P RETURN "<span style='width:" & FORMAT ( p * 100, "0.0", "en-US" ) & "%;background:#F2C811'></span>" )
+			VAR _Leg = "ENE " & FORMAT ( _E, "0%" ) & " · CNF " & FORMAT ( _C, "0%" ) & " · REL " & FORMAT ( _R, "0%" ) & IF ( _P >= 0.005, " · PAR " & FORMAT ( _P, "0%" ) )
+			VAR _BlocoRazoes = "<div class='sec'>Razão do corte</div><div class='bar'>" & _Seg & "</div><div class='leg'>" & _Leg & "</div>"
+			RETURN
+			    IF ( ISBLANK ( _NR ), "<div class='tt'><div class='k'>Estado</div><div class='t'>" & _Nome & "</div><div class='c'>Sem geração não realizada nos filtros.</div></div>",
+			    "<div class='tt'><div class='k'>Estado</div><div class='t'>" & _Nome & "</div>"
+			        & "<div class='g'><div><div class='v'>" & FORMAT ( _Pct, "0.0%" ) & "</div><div class='l'>da geração possível cortada</div></div>"
+			        & "<div><div class='v'>" & FORMAT ( _NR, "#,0" ) & "<small> GWh</small></div><div class='l'>" & FORMAT ( DIVIDE ( _NR, _Tot ), "0%" ) & " do corte total</div></div></div>"
+			        & "<div class='c'><b>" & _Rank & "º</b> maior % de " & COUNTROWS ( _Tab ) & " estados · " & FORMAT ( [Usinas com corte], "#,0" ) & " usinas com corte</div>"
+			        & "<div class='spk'><span>% cortado, 24 meses</span>" & [svg · sparkline % cortado] & "</div>"
+			        & _BlocoRazoes
+			        & "<div class='f'>Maior usina: <b>" & MAXX ( _Us, 'Usinas'[Usina] ) & "</b> · maior ponto: <b>" & MAXX ( _Pt, 'Usinas'[Ponto de conexão] ) & "</b></div>"
+			        & "</div>" )
+		isHidden
+		displayFolder: Dicas
+		lineageTag: 59cd04f3-f485-5ea0-8e24-d0545faf642f
+
+	/// Dica de ferramenta da usina (HTML Content)
+	measure 'html · Dica usina' =
+			VAR _N = DISTINCTCOUNT ( 'Usinas'[ID da usina] )
+			VAR _NR = [Não realizada (GWh)]
+			VAR _Tab =
+			    FILTER (
+			        ADDCOLUMNS ( CALCULATETABLE ( VALUES ( 'Usinas'[ID da usina] ), REMOVEFILTERS ( 'Usinas' ) ),
+			            "@v", VAR _u = 'Usinas'[ID da usina] RETURN CALCULATE ( [Não realizada (GWh)], REMOVEFILTERS ( 'Usinas' ), 'Usinas'[ID da usina] = _u ) ),
+			        [@v] > 0 )
+			VAR _Rank = COUNTROWS ( FILTER ( _Tab, [@v] > _NR ) ) + 1
+			VAR _T = [Não realizada (GWh)]
+			VAR _E = DIVIDE ( [Energética (ENE)], _T )
+			VAR _C = DIVIDE ( [Confiabilidade (CNF)], _T )
+			VAR _R = DIVIDE ( [Indisponibilidade externa (REL)], _T )
+			VAR _P = DIVIDE ( [Parecer de acesso (PAR)], _T )
+			VAR _Seg = ( VAR p = _E RETURN "<span style='width:" & FORMAT ( p * 100, "0.0", "en-US" ) & "%;background:#FFFFFF'></span>" )
+			    & ( VAR p = _C RETURN "<span style='width:" & FORMAT ( p * 100, "0.0", "en-US" ) & "%;background:#A19F9D'></span>" )
+			    & ( VAR p = _R RETURN "<span style='width:" & FORMAT ( p * 100, "0.0", "en-US" ) & "%;background:#605E5C'></span>" )
+			    & ( VAR p = _P RETURN "<span style='width:" & FORMAT ( p * 100, "0.0", "en-US" ) & "%;background:#F2C811'></span>" )
+			VAR _Leg = "ENE " & FORMAT ( _E, "0%" ) & " · CNF " & FORMAT ( _C, "0%" ) & " · REL " & FORMAT ( _R, "0%" ) & IF ( _P >= 0.005, " · PAR " & FORMAT ( _P, "0%" ) )
+			VAR _BlocoRazoes = "<div class='sec'>Razão do corte</div><div class='bar'>" & _Seg & "</div><div class='leg'>" & _Leg & "</div>"
+			RETURN
+			    IF ( _N <> 1, "<div class='tt'><div class='c'>Passe o mouse sobre uma usina.</div></div>",
+			    "<div class='tt'><div class='k'>" & SELECTEDVALUE ( 'Usinas'[Fonte] ) & " · " & SELECTEDVALUE ( 'Usinas'[UF] ) & "</div><div class='t'>" & SELECTEDVALUE ( 'Usinas'[Usina] ) & "</div>"
+			        & "<div class='m'>" & SELECTEDVALUE ( 'Usinas'[Agente operador] ) & " · " & SELECTEDVALUE ( 'Usinas'[Ponto de conexão] ) & "</div>"
+			        & "<div class='g'><div><div class='v'>" & FORMAT ( _NR, "#,0" ) & "<small> GWh</small></div><div class='l'>não gerados</div></div>"
+			        & "<div><div class='v'>" & FORMAT ( [% cortado], "0.0%" ) & "</div><div class='l'>de " & FORMAT ( [Geração possível (GWh)], "#,0" ) & " GWh possíveis</div></div></div>"
+			        & "<div class='c'><b>" & _Rank & "º</b> maior corte de " & COUNTROWS ( _Tab ) & " usinas · " & FORMAT ( [Dias com corte], "#,0" ) & " dias com corte</div>"
+			        & "<div class='spk'><span>Corte mensal, 24 meses</span>" & [svg · sparkline não realizada] & "</div>"
+			        & _BlocoRazoes
+			        & "</div>" )
+		isHidden
+		displayFolder: Dicas
+		lineageTag: bf0769a2-5abe-5c54-a3bf-d09abe0362e5
+
+
+
+
+
+	column usina_id
+		dataType: string
+		isHidden
+		lineageTag: 22aaefd4-666c-4dbc-a236-c101626b44a0
+		summarizeBy: none
+		sourceColumn: usina_id
+
+	column dia
+		dataType: dateTime
+		isHidden
+		formatString: dd/mm/yyyy
+		lineageTag: bebb438e-7c54-4110-bce8-8c11f615266f
+		summarizeBy: none
+		sourceColumn: dia
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column fonte
+		dataType: string
+		isHidden
+		lineageTag: 9c07ac82-08de-436f-9b10-c4de2cb8e319
+		summarizeBy: none
+		sourceColumn: fonte
+
+	column agente_operador
+		dataType: string
+		isHidden
+		lineageTag: d4296b7e-5569-445b-a367-00747fb4a703
+		summarizeBy: none
+		sourceColumn: agente_operador
+
+	column uf
+		dataType: string
+		isHidden
+		lineageTag: 3dad3648-4a3e-4364-8f5a-f54b35829e22
+		summarizeBy: none
+		sourceColumn: uf
+
+	column subsistema_id
+		dataType: string
+		isHidden
+		lineageTag: 8074ee7f-1a44-471a-bd38-f81e7077fae8
+		summarizeBy: none
+		sourceColumn: subsistema_id
+
+	column patamares
+		dataType: int64
+		isHidden
+		lineageTag: 31eec998-2257-4368-8d96-b046b8432137
+		summarizeBy: sum
+		sourceColumn: patamares
+
+	column patamares_limitados
+		dataType: int64
+		isHidden
+		lineageTag: 1ccae765-d58d-48ad-9c00-c8dfc6b5f661
+		summarizeBy: sum
+		sourceColumn: patamares_limitados
+
+	column horas_restricao
+		dataType: double
+		isHidden
+		lineageTag: 8c168450-f12d-4ad3-be2c-ada343015bf3
+		summarizeBy: sum
+		sourceColumn: horas_restricao
+
+	column patamares_minutos_invalidos
+		dataType: int64
+		isHidden
+		lineageTag: 8ddc5568-9cff-4db5-b3f6-4cdabbfc9628
+		summarizeBy: sum
+		sourceColumn: patamares_minutos_invalidos
+
+	column geracao_mwh
+		dataType: double
+		isHidden
+		lineageTag: b1350744-3403-4ca0-b495-c3da988f9692
+		summarizeBy: sum
+		sourceColumn: geracao_mwh
+
+	column referencia_mwh
+		dataType: double
+		isHidden
+		lineageTag: 2aef0e30-499a-49cc-b25c-46e1aee09513
+		summarizeBy: sum
+		sourceColumn: referencia_mwh
+
+	column nao_realizada_mwh
+		dataType: double
+		isHidden
+		lineageTag: 83a8b468-a594-4670-98fd-934ab68235a1
+		summarizeBy: sum
+		sourceColumn: nao_realizada_mwh
+
+	column nao_realizada_ene_mwh
+		dataType: double
+		isHidden
+		lineageTag: 1d191da7-e9fe-4026-ae33-f7dc36d7224b
+		summarizeBy: sum
+		sourceColumn: nao_realizada_ene_mwh
+
+	column nao_realizada_cnf_mwh
+		dataType: double
+		isHidden
+		lineageTag: 3ee81283-c0d4-423e-b972-69202389e6a6
+		summarizeBy: sum
+		sourceColumn: nao_realizada_cnf_mwh
+
+	column nao_realizada_rel_mwh
+		dataType: double
+		isHidden
+		lineageTag: ccf1f93c-3c2e-4894-aef9-53602cd2c8f9
+		summarizeBy: sum
+		sourceColumn: nao_realizada_rel_mwh
+
+	column nao_realizada_par_mwh
+		dataType: double
+		isHidden
+		lineageTag: 853e260a-3870-4e8c-9957-f980d9860913
+		summarizeBy: sum
+		sourceColumn: nao_realizada_par_mwh
+
+	column nao_realizada_sem_razao_mwh
+		dataType: double
+		isHidden
+		lineageTag: 17af0a9e-4210-4ee8-b678-6426caf5f156
+		summarizeBy: sum
+		sourceColumn: nao_realizada_sem_razao_mwh
+
+	column nao_realizada_loc_mwh
+		dataType: double
+		isHidden
+		lineageTag: ce1ea067-f32b-57b3-aac2-e63a09ed5ca9
+		summarizeBy: sum
+		sourceColumn: nao_realizada_loc_mwh
+
+	column nao_realizada_sis_mwh
+		dataType: double
+		isHidden
+		lineageTag: 04dd04fa-397f-5d99-b2cb-096f761d6294
+		summarizeBy: sum
+		sourceColumn: nao_realizada_sis_mwh
+
+	column nao_realizada_sem_origem_mwh
+		dataType: double
+		isHidden
+		lineageTag: 84bd31c4-e192-57e8-b4ee-5c7bffce1df9
+		summarizeBy: sum
+		sourceColumn: nao_realizada_sem_origem_mwh
+
+	/// Quantos filtros da gaveta estão em uso (contador do botão)
+	measure 'Filtros · contagem' =
+			INT ( ISFILTERED ( 'Calendário'[Ano] ) ) + INT ( ISFILTERED ( 'Fontes'[Fonte] ) ) + INT ( ISFILTERED ( 'Estados'[UF] ) ) + INT ( ISFILTERED ( 'Usinas'[Usina] ) )
+		formatString: 0
+		isHidden
+		displayFolder: Visual
+		lineageTag: 394b6b5f-dede-5c96-a175-71cc363f463b
+
+	/// Texto do botão que abre a gaveta de filtros
+	measure 'Filtros · botão' =
+			VAR _n = [Filtros · contagem]
+			RETURN "⏷  Filtros" & IF ( _n > 0, "  ·  " & _n )
+		isHidden
+		displayFolder: Visual
+		lineageTag: 3cdfac3f-de72-5f27-bb9e-d454acf70a4d
+
+	/// Resumo dos filtros em uso, para o cabeçalho
+	measure 'Filtros ativos (texto)' =
+			VAR _Ano = IF ( ISFILTERED ( 'Calendário'[Ano] ),
+			        VAR _nAno = COUNTROWS ( VALUES ( 'Calendário'[Ano] ) )
+			        RETURN IF ( _nAno <= 3, CONCATENATEX ( VALUES ( 'Calendário'[Ano] ), 'Calendário'[Ano], ", ", 'Calendário'[Ano], ASC ), _nAno & " anos" ) )
+			VAR _Fonte = IF ( ISFILTERED ( 'Fontes'[Fonte] ),
+			        VAR _nFonte = COUNTROWS ( VALUES ( 'Fontes'[Fonte] ) )
+			        RETURN IF ( _nFonte <= 3, CONCATENATEX ( VALUES ( 'Fontes'[Fonte] ), 'Fontes'[Fonte], ", ", 'Fontes'[Fonte], ASC ), _nFonte & " fontes" ) )
+			VAR _UF = IF ( ISFILTERED ( 'Estados'[UF] ),
+			        VAR _nUF = COUNTROWS ( VALUES ( 'Estados'[UF] ) )
+			        RETURN IF ( _nUF <= 3, CONCATENATEX ( VALUES ( 'Estados'[UF] ), 'Estados'[UF], ", ", 'Estados'[UF], ASC ), _nUF & " estados" ) )
+			VAR _Mes = IF ( ISFILTERED ( 'Calendário'[Mês] ), VAR _nMes = COUNTROWS ( VALUES ( 'Calendário'[Mês] ) )
+			        RETURN IF ( _nMes = 1, FORMAT ( MAX ( 'Calendário'[Mês] ), "mmm/yyyy" ), _nMes & " meses" ) )
+			VAR _Usina = IF ( ISFILTERED ( 'Usinas'[Usina] ), IF ( HASONEVALUE ( 'Usinas'[Usina] ), VALUES ( 'Usinas'[Usina] ), COUNTROWS ( VALUES ( 'Usinas'[Usina] ) ) & " usinas" ) )
+			VAR _Itens = FILTER ( { COALESCE ( _Mes, _Ano, "Todo o período" ), _Fonte, _UF, _Usina }, NOT ISBLANK ( [Value] ) && [Value] <> "" )
+			RETURN CONCATENATEX ( _Itens, [Value], "  ·  " )
+		isHidden
+		displayFolder: Visual
+		lineageTag: 33b16431-0710-525b-9388-e46b938f180c
+
+	/// Resumo dos filtros em uso (HTML Content do cabeçalho)
+	measure 'html · Filtros ativos' =
+			VAR _n = [Filtros · contagem]
+			RETURN "<div class='f'><span class='k'>" & IF ( _n > 0, "Filtros", "Sem filtros" ) & "</span>" & [Filtros ativos (texto)] & "</div>"
+		isHidden
+		displayFolder: Visual
+		lineageTag: dab592fb-8d59-5ca0-9fc2-635281cf8753
+
+	partition 'Restrição diária' = m
+		mode: import
+		source =
+				let
+				    Fonte = PostgreSQL.Database(Servidor, Banco),
+				    Tabela = Fonte{[Schema = "marts", Item = "fct_restricao_usina_dia"]}[Data]
+				in
+				    Tabela
+

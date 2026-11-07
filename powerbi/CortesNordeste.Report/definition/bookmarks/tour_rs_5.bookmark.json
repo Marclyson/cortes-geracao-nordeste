@@ -1,0 +1,35 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmark/1.4.0/schema.json",
+  "displayName": "Tour – passo 5",
+  "name": "tour_rs_5",
+  "options": {
+    "targetVisualNames": [],
+    "suppressData": true
+  },
+  "explorationState": {
+    "version": "1.3",
+    "activeSection": "razoes_sazonalidade",
+    "sections": {
+      "razoes_sazonalidade": {
+        "visualContainers": {},
+        "visualContainerGroups": {
+          "tour_rs_1": {
+            "isHidden": true
+          },
+          "tour_rs_2": {
+            "isHidden": true
+          },
+          "tour_rs_3": {
+            "isHidden": true
+          },
+          "tour_rs_4": {
+            "isHidden": true
+          },
+          "tour_rs_5": {
+            "isHidden": false
+          }
+        }
+      }
+    }
+  }
+}

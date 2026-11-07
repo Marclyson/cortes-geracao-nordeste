@@ -1,0 +1,105 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmarksMetadata/1.0.0/schema.json",
+  "items": [
+    {
+      "name": "tour_vg",
+      "displayName": "Tour – Visão executiva",
+      "children": [
+        "tour_vg_off",
+        "tour_vg_1",
+        "tour_vg_2",
+        "tour_vg_3",
+        "tour_vg_4",
+        "tour_vg_5",
+        "tour_vg_6"
+      ]
+    },
+    {
+      "name": "tour_rs",
+      "displayName": "Tour – Razões e sazonalidade",
+      "children": [
+        "tour_rs_off",
+        "tour_rs_1",
+        "tour_rs_2",
+        "tour_rs_3",
+        "tour_rs_4",
+        "tour_rs_5"
+      ]
+    },
+    {
+      "name": "tour_eu",
+      "displayName": "Tour – Rede e território",
+      "children": [
+        "tour_eu_off",
+        "tour_eu_1",
+        "tour_eu_2",
+        "tour_eu_3",
+        "tour_eu_4",
+        "tour_eu_5"
+      ]
+    },
+    {
+      "name": "tour_ua",
+      "displayName": "Tour – Usinas e agentes",
+      "children": [
+        "tour_ua_off",
+        "tour_ua_1",
+        "tour_ua_2",
+        "tour_ua_3",
+        "tour_ua_4"
+      ]
+    },
+    {
+      "name": "tour_du",
+      "displayName": "Tour – Detalhe da usina",
+      "children": [
+        "tour_du_off",
+        "tour_du_1",
+        "tour_du_2",
+        "tour_du_3",
+        "tour_du_4",
+        "tour_du_5"
+      ]
+    },
+    {
+      "name": "filtros_vg",
+      "displayName": "Filtros – Visão executiva",
+      "children": [
+        "filtros_vg_abrir",
+        "filtros_vg_fechar"
+      ]
+    },
+    {
+      "name": "filtros_rs",
+      "displayName": "Filtros – Razões e sazonalidade",
+      "children": [
+        "filtros_rs_abrir",
+        "filtros_rs_fechar"
+      ]
+    },
+    {
+      "name": "filtros_eu",
+      "displayName": "Filtros – Rede e território",
+      "children": [
+        "filtros_eu_abrir",
+        "filtros_eu_fechar"
+      ]
+    },
+    {
+      "name": "filtros_ua",
+      "displayName": "Filtros – Usinas e agentes",
+      "children": [
+        "filtros_ua_abrir",
+        "filtros_ua_fechar"
+      ]
+    },
+    {
+      "name": "filtros_du",
+      "displayName": "Filtros – Detalhe da usina",
+      "children": [
+        "filtros_du_abrir",
+        "filtros_du_fechar"
+      ]
+    }
+  ]
+}

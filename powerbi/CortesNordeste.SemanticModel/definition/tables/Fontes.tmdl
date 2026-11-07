@@ -1,0 +1,28 @@
+/// Fontes de geração (a partir de marts.dim_usina)
+table Fontes
+	lineageTag: e6e7d806-1926-5ed2-905e-8b8e8dd94497
+
+	column Fonte
+		dataType: string
+		lineageTag: 2b48ee50-d970-50d5-81df-e68df3032e5e
+		summarizeBy: none
+		sourceColumn: fonte_nome
+
+	column Código
+		dataType: string
+		isHidden
+		isKey
+		lineageTag: 70e5c8a5-65b3-5b83-90f2-54b470cafd4a
+		summarizeBy: none
+		sourceColumn: fonte
+
+	partition Fontes = m
+		mode: import
+		source =
+				let
+				    Fonte = PostgreSQL.Database(Servidor, Banco),
+				    Tabela = Fonte{[Schema = "marts", Item = "dim_usina"]}[Data],
+				    Colunas = Table.Distinct(Table.SelectColumns(Tabela, {"fonte", "fonte_nome"}))
+				in
+				    Colunas
+

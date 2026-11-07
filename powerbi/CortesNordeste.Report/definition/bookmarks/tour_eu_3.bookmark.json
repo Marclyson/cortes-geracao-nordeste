@@ -1,0 +1,35 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmark/1.4.0/schema.json",
+  "displayName": "Tour – passo 3",
+  "name": "tour_eu_3",
+  "options": {
+    "targetVisualNames": [],
+    "suppressData": true
+  },
+  "explorationState": {
+    "version": "1.3",
+    "activeSection": "estados_usinas",
+    "sections": {
+      "estados_usinas": {
+        "visualContainers": {},
+        "visualContainerGroups": {
+          "tour_eu_1": {
+            "isHidden": true
+          },
+          "tour_eu_2": {
+            "isHidden": true
+          },
+          "tour_eu_3": {
+            "isHidden": false
+          },
+          "tour_eu_4": {
+            "isHidden": true
+          },
+          "tour_eu_5": {
+            "isHidden": true
+          }
+        }
+      }
+    }
+  }
+}

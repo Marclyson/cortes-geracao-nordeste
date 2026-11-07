@@ -1,0 +1,395 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.3.0/schema.json",
+  "name": "dispersao",
+  "position": {
+    "x": 736,
+    "y": 84,
+    "z": 3000,
+    "height": 360,
+    "width": 520,
+    "tabOrder": 5000
+  },
+  "visual": {
+    "visualType": "deneb7E15AEF80B9E4D4F8E12924291ECE89A",
+    "query": {
+      "queryState": {
+        "dataset": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Usinas"
+                    }
+                  },
+                  "Property": "ID da usina"
+                }
+              },
+              "queryRef": "Usinas.ID da usina",
+              "nativeQueryRef": "ID da usina"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Usinas"
+                    }
+                  },
+                  "Property": "Usina"
+                }
+              },
+              "queryRef": "Usinas.Usina",
+              "nativeQueryRef": "Usina"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Usinas"
+                    }
+                  },
+                  "Property": "Fonte"
+                }
+              },
+              "queryRef": "Usinas.Fonte",
+              "nativeQueryRef": "Fonte"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Restrição diária"
+                    }
+                  },
+                  "Property": "Geração possível (GWh)"
+                }
+              },
+              "queryRef": "Restrição diária.Geração possível (GWh)",
+              "nativeQueryRef": "Geração possível (GWh)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Restrição diária"
+                    }
+                  },
+                  "Property": "% cortado"
+                }
+              },
+              "queryRef": "Restrição diária.% cortado",
+              "nativeQueryRef": "% cortado"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Restrição diária"
+                    }
+                  },
+                  "Property": "Não realizada (GWh)"
+                }
+              },
+              "queryRef": "Restrição diária.Não realizada (GWh)",
+              "nativeQueryRef": "Não realizada (GWh)"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "vega": [
+        {
+          "properties": {
+            "jsonSpec": {
+              "expr": {
+                "Literal": {
+                  "Value": "'{\n  \"data\": {\n    \"name\": \"dataset\"\n  },\n  \"width\": \"container\",\n  \"height\": \"container\",\n  \"transform\": [\n    {\n      \"filter\": \"datum[''Geração possível (GWh)''] > 1 && isValid(datum[''% cortado''])\"\n    },\n    {\n      \"joinaggregate\": [\n        {\n          \"op\": \"median\",\n          \"field\": \"Geração possível (GWh)\",\n          \"as\": \"mx\"\n        },\n        {\n          \"op\": \"median\",\n          \"field\": \"% cortado\",\n          \"as\": \"my\"\n        }\n      ]\n    }\n  ],\n  \"layer\": [\n    {\n      \"mark\": {\n        \"type\": \"rule\",\n        \"color\": \"#A19F9D\",\n        \"strokeDash\": [\n          4,\n          3\n        ]\n      },\n      \"encoding\": {\n        \"x\": {\n          \"aggregate\": \"median\",\n          \"field\": \"Geração possível (GWh)\",\n          \"type\": \"quantitative\"\n        }\n      }\n    },\n    {\n      \"mark\": {\n        \"type\": \"rule\",\n        \"color\": \"#A19F9D\",\n        \"strokeDash\": [\n          4,\n          3\n        ]\n      },\n      \"encoding\": {\n        \"y\": {\n          \"aggregate\": \"median\",\n          \"field\": \"% cortado\",\n          \"type\": \"quantitative\"\n        }\n      }\n    },\n    {\n      \"mark\": {\n        \"type\": \"circle\",\n        \"opacity\": 0.8,\n        \"stroke\": \"#FFFFFF\",\n        \"strokeWidth\": 0.5\n      },\n      \"encoding\": {\n        \"x\": {\n          \"field\": \"Geração possível (GWh)\",\n          \"type\": \"quantitative\",\n          \"scale\": {\n            \"type\": \"log\"\n          },\n          \"title\": \"Porte: geração possível (GWh, escala log)\",\n          \"axis\": {\n            \"grid\": false,\n            \"values\": [\n              1,\n              10,\n              100,\n              1000,\n              10000,\n              100000\n            ],\n            \"format\": \"~s\",\n            \"tickColor\": \"#C8C6C4\"\n          }\n        },\n        \"y\": {\n          \"field\": \"% cortado\",\n          \"type\": \"quantitative\",\n          \"title\": \"% cortado\",\n          \"axis\": {\n            \"format\": \".0%\",\n            \"tickCount\": 4,\n            \"gridOpacity\": 0.6\n          }\n        },\n        \"size\": {\n          \"field\": \"Não realizada (GWh)\",\n          \"type\": \"quantitative\",\n          \"scale\": {\n            \"range\": [\n              10,\n              260\n            ]\n          },\n          \"legend\": null\n        },\n        \"color\": {\n          \"field\": \"Fonte\",\n          \"type\": \"nominal\",\n          \"scale\": {\n            \"domain\": [\n              \"Eólica\",\n              \"Solar\"\n            ],\n            \"range\": [\n              \"#252423\",\n              \"#E0B000\"\n            ]\n          },\n          \"legend\": {\n            \"orient\": \"top\",\n            \"direction\": \"horizontal\",\n            \"title\": null\n          }\n        },\n        \"tooltip\": [\n          {\n            \"field\": \"Usina\"\n          },\n          {\n            \"field\": \"Fonte\"\n          },\n          {\n            \"field\": \"Geração possível (GWh)\",\n            \"title\": \"Geração possível (GWh)\",\n            \"format\": \",.0f\"\n          },\n          {\n            \"field\": \"% cortado\",\n            \"format\": \".1%\"\n          },\n          {\n            \"field\": \"Não realizada (GWh)\",\n            \"title\": \"Não realizada (GWh)\",\n            \"format\": \",.0f\"\n          }\n        ],\n        \"opacity\": {\n          \"condition\": {\n            \"test\": \"datum.__selected__ == ''off''\",\n            \"value\": 0.2\n          },\n          \"value\": 0.8\n        }\n      }\n    },\n    {\n      \"transform\": [\n        {\n          \"filter\": \"datum[''Geração possível (GWh)''] >= datum.mx && datum[''% cortado''] >= datum.my\"\n        },\n        {\n          \"aggregate\": [\n            {\n              \"op\": \"count\",\n              \"as\": \"n\"\n            }\n          ]\n        },\n        {\n          \"calculate\": \"''Grandes e muito cortadas · '' + datum.n + (datum.n == 1 ? '' usina'' : '' usinas'')\",\n          \"as\": \"txt\"\n        }\n      ],\n      \"mark\": {\n        \"type\": \"text\",\n        \"align\": \"right\",\n        \"baseline\": \"top\",\n        \"fontSize\": 10,\n        \"fontWeight\": \"bold\",\n        \"color\": \"#FFFFFF\",\n        \"stroke\": \"#FFFFFF\",\n        \"strokeWidth\": 4,\n        \"strokeJoin\": \"round\"\n      },\n      \"encoding\": {\n        \"text\": {\n          \"field\": \"txt\"\n        },\n        \"x\": {\n          \"value\": {\n            \"expr\": \"width - 4\"\n          }\n        },\n        \"y\": {\n          \"value\": 4\n        }\n      }\n    },\n    {\n      \"transform\": [\n        {\n          \"filter\": \"datum[''Geração possível (GWh)''] >= datum.mx && datum[''% cortado''] >= datum.my\"\n        },\n        {\n          \"aggregate\": [\n            {\n              \"op\": \"count\",\n              \"as\": \"n\"\n            }\n          ]\n        },\n        {\n          \"calculate\": \"''Grandes e muito cortadas · '' + datum.n + (datum.n == 1 ? '' usina'' : '' usinas'')\",\n          \"as\": \"txt\"\n        }\n      ],\n      \"mark\": {\n        \"type\": \"text\",\n        \"align\": \"right\",\n        \"baseline\": \"top\",\n        \"fontSize\": 10,\n        \"fontWeight\": \"bold\",\n        \"color\": \"#967100\"\n      },\n      \"encoding\": {\n        \"text\": {\n          \"field\": \"txt\"\n        },\n        \"x\": {\n          \"value\": {\n            \"expr\": \"width - 4\"\n          }\n        },\n        \"y\": {\n          \"value\": 4\n        }\n      }\n    },\n    {\n      \"transform\": [\n        {\n          \"filter\": \"datum[''Geração possível (GWh)''] < datum.mx && datum[''% cortado''] >= datum.my\"\n        },\n        {\n          \"aggregate\": [\n            {\n              \"op\": \"count\",\n              \"as\": \"n\"\n            }\n          ]\n        },\n        {\n          \"calculate\": \"''Pequenas e muito cortadas · '' + datum.n + (datum.n == 1 ? '' usina'' : '' usinas'')\",\n          \"as\": \"txt\"\n        }\n      ],\n      \"mark\": {\n        \"type\": \"text\",\n        \"align\": \"left\",\n        \"baseline\": \"top\",\n        \"fontSize\": 10,\n        \"fontWeight\": \"bold\",\n        \"color\": \"#FFFFFF\",\n        \"stroke\": \"#FFFFFF\",\n        \"strokeWidth\": 4,\n        \"strokeJoin\": \"round\"\n      },\n      \"encoding\": {\n        \"text\": {\n          \"field\": \"txt\"\n        },\n        \"x\": {\n          \"value\": 4\n        },\n        \"y\": {\n          \"value\": 4\n        }\n      }\n    },\n    {\n      \"transform\": [\n        {\n          \"filter\": \"datum[''Geração possível (GWh)''] < datum.mx && datum[''% cortado''] >= datum.my\"\n        },\n        {\n          \"aggregate\": [\n            {\n              \"op\": \"count\",\n              \"as\": \"n\"\n            }\n          ]\n        },\n        {\n          \"calculate\": \"''Pequenas e muito cortadas · '' + datum.n + (datum.n == 1 ? '' usina'' : '' usinas'')\",\n          \"as\": \"txt\"\n        }\n      ],\n      \"mark\": {\n        \"type\": \"text\",\n        \"align\": \"left\",\n        \"baseline\": \"top\",\n        \"fontSize\": 10,\n        \"fontWeight\": \"bold\",\n        \"color\": \"#605E5C\"\n      },\n      \"encoding\": {\n        \"text\": {\n          \"field\": \"txt\"\n        },\n        \"x\": {\n          \"value\": 4\n        },\n        \"y\": {\n          \"value\": 4\n        }\n      }\n    },\n    {\n      \"transform\": [\n        {\n          \"filter\": \"datum[''Geração possível (GWh)''] >= datum.mx && datum[''% cortado''] < datum.my\"\n        },\n        {\n          \"aggregate\": [\n            {\n              \"op\": \"count\",\n              \"as\": \"n\"\n            }\n          ]\n        },\n        {\n          \"calculate\": \"''Grandes e pouco cortadas · '' + datum.n + (datum.n == 1 ? '' usina'' : '' usinas'')\",\n          \"as\": \"txt\"\n        }\n      ],\n      \"mark\": {\n        \"type\": \"text\",\n        \"align\": \"right\",\n        \"baseline\": \"bottom\",\n        \"fontSize\": 10,\n        \"fontWeight\": \"bold\",\n        \"color\": \"#FFFFFF\",\n        \"stroke\": \"#FFFFFF\",\n        \"strokeWidth\": 4,\n        \"strokeJoin\": \"round\"\n      },\n      \"encoding\": {\n        \"text\": {\n          \"field\": \"txt\"\n        },\n        \"x\": {\n          \"value\": {\n            \"expr\": \"width - 4\"\n          }\n        },\n        \"y\": {\n          \"value\": {\n            \"expr\": \"height - 4\"\n          }\n        }\n      }\n    },\n    {\n      \"transform\": [\n        {\n          \"filter\": \"datum[''Geração possível (GWh)''] >= datum.mx && datum[''% cortado''] < datum.my\"\n        },\n        {\n          \"aggregate\": [\n            {\n              \"op\": \"count\",\n              \"as\": \"n\"\n            }\n          ]\n        },\n        {\n          \"calculate\": \"''Grandes e pouco cortadas · '' + datum.n + (datum.n == 1 ? '' usina'' : '' usinas'')\",\n          \"as\": \"txt\"\n        }\n      ],\n      \"mark\": {\n        \"type\": \"text\",\n        \"align\": \"right\",\n        \"baseline\": \"bottom\",\n        \"fontSize\": 10,\n        \"fontWeight\": \"bold\",\n        \"color\": \"#605E5C\"\n      },\n      \"encoding\": {\n        \"text\": {\n          \"field\": \"txt\"\n        },\n        \"x\": {\n          \"value\": {\n            \"expr\": \"width - 4\"\n          }\n        },\n        \"y\": {\n          \"value\": {\n            \"expr\": \"height - 4\"\n          }\n        }\n      }\n    },\n    {\n      \"transform\": [\n        {\n          \"filter\": \"datum[''Geração possível (GWh)''] < datum.mx && datum[''% cortado''] < datum.my\"\n        },\n        {\n          \"aggregate\": [\n            {\n              \"op\": \"count\",\n              \"as\": \"n\"\n            }\n          ]\n        },\n        {\n          \"calculate\": \"''Pequenas e pouco cortadas · '' + datum.n + (datum.n == 1 ? '' usina'' : '' usinas'')\",\n          \"as\": \"txt\"\n        }\n      ],\n      \"mark\": {\n        \"type\": \"text\",\n        \"align\": \"left\",\n        \"baseline\": \"bottom\",\n        \"fontSize\": 10,\n        \"fontWeight\": \"bold\",\n        \"color\": \"#FFFFFF\",\n        \"stroke\": \"#FFFFFF\",\n        \"strokeWidth\": 4,\n        \"strokeJoin\": \"round\"\n      },\n      \"encoding\": {\n        \"text\": {\n          \"field\": \"txt\"\n        },\n        \"x\": {\n          \"value\": 4\n        },\n        \"y\": {\n          \"value\": {\n            \"expr\": \"height - 4\"\n          }\n        }\n      }\n    },\n    {\n      \"transform\": [\n        {\n          \"filter\": \"datum[''Geração possível (GWh)''] < datum.mx && datum[''% cortado''] < datum.my\"\n        },\n        {\n          \"aggregate\": [\n            {\n              \"op\": \"count\",\n              \"as\": \"n\"\n            }\n          ]\n        },\n        {\n          \"calculate\": \"''Pequenas e pouco cortadas · '' + datum.n + (datum.n == 1 ? '' usina'' : '' usinas'')\",\n          \"as\": \"txt\"\n        }\n      ],\n      \"mark\": {\n        \"type\": \"text\",\n        \"align\": \"left\",\n        \"baseline\": \"bottom\",\n        \"fontSize\": 10,\n        \"fontWeight\": \"bold\",\n        \"color\": \"#605E5C\"\n      },\n      \"encoding\": {\n        \"text\": {\n          \"field\": \"txt\"\n        },\n        \"x\": {\n          \"value\": 4\n        },\n        \"y\": {\n          \"value\": {\n            \"expr\": \"height - 4\"\n          }\n        }\n      }\n    }\n  ]\n}'"
+                }
+              }
+            },
+            "jsonConfig": {
+              "expr": {
+                "Literal": {
+                  "Value": "'{\n  \"locale\": {\n    \"number\": {\n      \"decimal\": \",\",\n      \"thousands\": \".\",\n      \"grouping\": [\n        3\n      ],\n      \"currency\": [\n        \"R$ \",\n        \"\"\n      ]\n    },\n    \"time\": {\n      \"dateTime\": \"%A, %e de %B de %Y. %X\",\n      \"date\": \"%d/%m/%Y\",\n      \"time\": \"%H:%M:%S\",\n      \"periods\": [\n        \"AM\",\n        \"PM\"\n      ],\n      \"days\": [\n        \"domingo\",\n        \"segunda\",\n        \"terça\",\n        \"quarta\",\n        \"quinta\",\n        \"sexta\",\n        \"sábado\"\n      ],\n      \"shortDays\": [\n        \"dom\",\n        \"seg\",\n        \"ter\",\n        \"qua\",\n        \"qui\",\n        \"sex\",\n        \"sáb\"\n      ],\n      \"months\": [\n        \"janeiro\",\n        \"fevereiro\",\n        \"março\",\n        \"abril\",\n        \"maio\",\n        \"junho\",\n        \"julho\",\n        \"agosto\",\n        \"setembro\",\n        \"outubro\",\n        \"novembro\",\n        \"dezembro\"\n      ],\n      \"shortMonths\": [\n        \"jan\",\n        \"fev\",\n        \"mar\",\n        \"abr\",\n        \"mai\",\n        \"jun\",\n        \"jul\",\n        \"ago\",\n        \"set\",\n        \"out\",\n        \"nov\",\n        \"dez\"\n      ]\n    }\n  },\n  \"autosize\": {\n    \"type\": \"fit\",\n    \"contains\": \"padding\"\n  },\n  \"background\": \"transparent\",\n  \"font\": \"Segoe UI, Open Sans, sans-serif\",\n  \"view\": {\n    \"stroke\": null\n  },\n  \"axis\": {\n    \"labelColor\": \"#605E5C\",\n    \"titleColor\": \"#605E5C\",\n    \"labelFontSize\": 10,\n    \"titleFontSize\": 10,\n    \"titleFontWeight\": \"normal\",\n    \"gridColor\": \"#EDEBE9\",\n    \"domain\": false,\n    \"tickColor\": \"#E1DFDD\"\n  },\n  \"axisX\": {\n    \"grid\": false\n  },\n  \"legend\": {\n    \"labelColor\": \"#605E5C\",\n    \"titleColor\": \"#605E5C\",\n    \"labelFontSize\": 10,\n    \"symbolType\": \"square\"\n  },\n  \"bar\": {\n    \"cornerRadiusEnd\": 0\n  },\n  \"line\": {\n    \"strokeWidth\": 2\n  }\n}'"
+                }
+              }
+            },
+            "provider": {
+              "expr": {
+                "Literal": {
+                  "Value": "'vegaLite'"
+                }
+              }
+            },
+            "renderMode": {
+              "expr": {
+                "Literal": {
+                  "Value": "'svg'"
+                }
+              }
+            },
+            "enableTooltips": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "enableSelection": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "selectionMaxDataPoints": {
+              "expr": {
+                "Literal": {
+                  "Value": "250D"
+                }
+              }
+            },
+            "version": {
+              "expr": {
+                "Literal": {
+                  "Value": "'6.4.3'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "developer": [
+        {
+          "properties": {
+            "locale": {
+              "expr": {
+                "Literal": {
+                  "Value": "'pt-BR'"
+                }
+              }
+            },
+            "version": {
+              "expr": {
+                "Literal": {
+                  "Value": "'2.0.1.0'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateManagement": [
+        {
+          "properties": {
+            "viewportHeight": {
+              "expr": {
+                "Literal": {
+                  "Value": "313D"
+                }
+              }
+            },
+            "viewportWidth": {
+              "expr": {
+                "Literal": {
+                  "Value": "494D"
+                }
+              }
+            },
+            "supportFieldConfiguration": {
+              "expr": {
+                "Literal": {
+                  "Value": "'{\"ID da usina\":{\"highlight\":false,\"highlightStatus\":false,\"highlightComparator\":false,\"format\":false,\"formatted\":false,\"names\":false},\"Usina\":{\"highlight\":false,\"highlightStatus\":false,\"highlightComparator\":false,\"format\":false,\"formatted\":false,\"names\":false},\"Fonte\":{\"highlight\":false,\"highlightStatus\":false,\"highlightComparator\":false,\"format\":false,\"formatted\":false,\"names\":false},\"Geração possível (GWh)\":{\"highlight\":false,\"highlightStatus\":false,\"highlightComparator\":false,\"format\":true,\"formatted\":true,\"names\":false},\"% cortado\":{\"highlight\":false,\"highlightStatus\":false,\"highlightComparator\":false,\"format\":true,\"formatted\":true,\"names\":false},\"Não realizada (GWh)\":{\"highlight\":false,\"highlightStatus\":false,\"highlightComparator\":false,\"format\":true,\"formatted\":true,\"names\":false}}'"
+                }
+              }
+            },
+            "denebMetaVersion": {
+              "expr": {
+                "Literal": {
+                  "Value": "'2'"
+                }
+              }
+            },
+            "consolidateFieldParameters": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Porte x % cortado, por usina'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "11D"
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#191919'"
+                    }
+                  }
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#FFFFFF'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#E1DFDD'"
+                    }
+                  }
+                }
+              }
+            },
+            "width": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
+                }
+              }
+            },
+            "radius": {
+              "expr": {
+                "Literal": {
+                  "Value": "2D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualHeader": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualTooltip": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "section": {
+              "expr": {
+                "Literal": {
+                  "Value": "'dica_usina'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Dispersão de usinas: porte da geração possível no eixo horizontal e percentual cortado no vertical, com cor por fonte e quadrantes pela mediana.'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

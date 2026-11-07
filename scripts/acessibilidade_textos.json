@@ -1,0 +1,23 @@
+{
+  "visao_geral/kpis": "Indicadores dos últimos 12 meses, ou do ano filtrado: geração não realizada em GWh, percentual da geração possível cortada, geração verificada e usinas com corte, com a variação contra o período anterior equivalente e a tendência de 24 meses.",
+  "visao_geral/hero_barras": "Gráfico de barras empilhadas com a geração não realizada por mês, em GWh, separada entre eólica e solar. Passe o mouse em um mês para ver o detalhamento.",
+  "visao_geral/hero_pct": "Gráfico de linhas com o percentual da geração possível que foi cortado em cada mês, uma linha por fonte.",
+  "visao_geral/destaques": "Destaques do mesmo período dos indicadores: a razão principal, a parte sistêmica e o estado, a usina e o mês com mais geração não realizada.",
+  "visao_geral/razoes_origem": "Barras com a participação de cada razão do corte (energética, confiabilidade, indisponibilidade externa e parecer de acesso) e da origem local ou sistêmica, no mesmo período dos indicadores.",
+  "razoes_sazonalidade/participacao": "Barras 100% empilhadas com a participação de cada razão no corte de cada mês.",
+  "razoes_sazonalidade/heatmap": "Mapa de calor com a geração não realizada por mês do ano e por ano, em GWh; cores mais escuras indicam mais corte.",
+  "razoes_sazonalidade/perfil": "Barras com a geração não realizada por hora do dia, empilhadas por fonte, e linha com o percentual da geração possível cortada em cada hora.",
+  "razoes_sazonalidade/calendario": "Calendário com o corte de cada dia nos últimos 12 meses com dados; cores mais escuras indicam mais geração não realizada.",
+  "estados_usinas/uf": "Barras horizontais com o percentual da geração possível cortada em cada estado, ordenadas do maior para o menor.",
+  "estados_usinas/pareto": "Gráfico de Pareto dos pontos de conexão com mais corte: barras com a geração não realizada e linha com o percentual acumulado, com referência em 80%.",
+  "estados_usinas/concentracao": "Resumo da concentração do corte: quantos pontos de conexão e quantas usinas respondem por 80% da geração não realizada.",
+  "estados_usinas/subsistema": "Barras com a geração não realizada e o percentual cortado por subsistema elétrico.",
+  "usinas_agentes/ranking": "Lista das 10 usinas e conjuntos com mais geração não realizada, com percentual cortado e tendência. Clique numa usina para filtrar a página.",
+  "usinas_agentes/dispersao": "Dispersão de usinas: porte da geração possível no eixo horizontal e percentual cortado no vertical, com cor por fonte e quadrantes pela mediana.",
+  "usinas_agentes/agentes": "Barras com os 10 agentes operadores com mais geração não realizada e o percentual cortado de cada um.",
+  "detalhe_usina/ficha": "Ficha da usina selecionada: cadastro, geração não realizada, percentual cortado, dias com corte, horas por dia com corte e razão principal.",
+  "detalhe_usina/mensal": "Barras com a geração não realizada por mês da usina selecionada e linha com o percentual cortado.",
+  "detalhe_usina/razao_origem": "Barras com a participação de cada razão e origem no corte da usina selecionada.",
+  "detalhe_usina/calendario": "Calendário com o corte de cada dia nos últimos 12 meses com dados para a usina selecionada.",
+  "filtros_resumo": "Resumo dos filtros em uso no relatório."
+}

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.3.0/schema.json",
+  "name": "tour_eu_1",
+  "position": {
+    "x": 0,
+    "y": 0,
+    "z": 30020,
+    "height": 720,
+    "width": 1280,
+    "tabOrder": 30020
+  },
+  "visualGroup": {
+    "displayName": "Tour 1 - Filtros da página",
+    "groupMode": "ScaleMode",
+    "objects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "isHidden": true
+}

@@ -1,0 +1,27 @@
+/// Estados das usinas (a partir de marts.dim_usina)
+table Estados
+	lineageTag: ed02bd37-00d6-55a5-83e3-af263322a957
+
+	column UF
+		dataType: string
+		isKey
+		lineageTag: 1c1faa4e-06d6-5a7e-ad8c-1196a96af613
+		summarizeBy: none
+		sourceColumn: uf
+
+	column Estado
+		dataType: string
+		lineageTag: 3b36b413-9e87-521c-9696-4e70cc90d1a3
+		summarizeBy: none
+		sourceColumn: estado
+
+	partition Estados = m
+		mode: import
+		source =
+				let
+				    Fonte = PostgreSQL.Database(Servidor, Banco),
+				    Tabela = Fonte{[Schema = "marts", Item = "dim_usina"]}[Data],
+				    Colunas = Table.Distinct(Table.SelectColumns(Tabela, {"uf", "estado"}))
+				in
+				    Colunas
+

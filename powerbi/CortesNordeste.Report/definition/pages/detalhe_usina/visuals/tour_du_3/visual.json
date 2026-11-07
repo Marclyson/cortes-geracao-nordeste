@@ -1,0 +1,32 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.3.0/schema.json",
+  "name": "tour_du_3",
+  "position": {
+    "x": 0,
+    "y": 0,
+    "z": 30060,
+    "height": 720,
+    "width": 1280,
+    "tabOrder": 30060
+  },
+  "visualGroup": {
+    "displayName": "Tour 3 - Série mensal",
+    "groupMode": "ScaleMode",
+    "objects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "isHidden": true
+}

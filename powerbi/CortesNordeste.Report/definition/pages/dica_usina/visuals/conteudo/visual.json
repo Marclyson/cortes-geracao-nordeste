@@ -1,0 +1,172 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.3.0/schema.json",
+  "name": "conteudo",
+  "position": {
+    "x": 0,
+    "y": 0,
+    "z": 1000,
+    "height": 270,
+    "width": 360,
+    "tabOrder": 1000
+  },
+  "visual": {
+    "visualType": "htmlContent443BE3AD55E043BF878BED274D3A6865",
+    "query": {
+      "queryState": {
+        "content": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Restrição diária"
+                    }
+                  },
+                  "Property": "html · Dica usina"
+                }
+              },
+              "queryRef": "Restrição diária.html · Dica usina",
+              "nativeQueryRef": "html · Dica usina"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "compatibility": [
+        {
+          "properties": {
+            "legacyRendering": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stylesheet": [
+        {
+          "properties": {
+            "stylesheet": {
+              "expr": {
+                "Literal": {
+                  "Value": "'*{font-family:''Segoe UI'',sans-serif;box-sizing:border-box}\n.tt{background:#191919;color:#FFFFFF;padding:12px 14px;border-top:3px solid #F2C811;min-height:100%}\n.k{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:#F2C811;font-weight:700}\n.t{font-size:15px;font-weight:600;margin:2px 0 6px 0;line-height:1.2}\n.m{font-size:10px;color:#C8C6C4;margin:-4px 0 6px 0}\n.g{display:flex;gap:16px;margin-bottom:6px}.g>div{flex:1}\n.v{font-size:20px;font-weight:600;line-height:1.1}.v small{font-size:11px;font-weight:400;color:#C8C6C4}\n.l{font-size:10px;color:#C8C6C4}\n.c{font-size:11px;color:#E1DFDD;margin-bottom:7px}.c b{color:#FFFFFF}.ruim{color:#FF8A65 !important}.bom{color:#7FD17F !important}\n.sec{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:#A19F9D;margin-bottom:3px}\n.bar{display:flex;height:8px;background:#3C3C41;margin-bottom:3px}.bar span{display:block;height:8px}\n.leg{font-size:10px;color:#C8C6C4;margin-bottom:6px}\n.spk{display:flex;align-items:center;justify-content:space-between;font-size:10px;color:#A19F9D;margin-bottom:6px}\n.spk svg polyline{stroke:#C8C6C4}\n.f{font-size:10px;color:#C8C6C4;border-top:1px solid #3C3C41;padding-top:6px}.f b{color:#FFFFFF}\n.n{font-size:10px;color:#F2C811;margin-top:4px}'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualHeader": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#191919'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "padding": [
+        {
+          "properties": {
+            "top": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "bottom": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "left": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "right": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

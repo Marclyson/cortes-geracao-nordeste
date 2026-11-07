@@ -1,0 +1,333 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.3.0/schema.json",
+  "name": "subsistema",
+  "position": {
+    "x": 868,
+    "y": 496,
+    "z": 5000,
+    "height": 204,
+    "width": 388,
+    "tabOrder": 7000
+  },
+  "visual": {
+    "visualType": "deneb7E15AEF80B9E4D4F8E12924291ECE89A",
+    "query": {
+      "queryState": {
+        "dataset": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Usinas"
+                    }
+                  },
+                  "Property": "Subsistema"
+                }
+              },
+              "queryRef": "Usinas.Subsistema",
+              "nativeQueryRef": "Subsistema"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Restrição diária"
+                    }
+                  },
+                  "Property": "Não realizada (GWh)"
+                }
+              },
+              "queryRef": "Restrição diária.Não realizada (GWh)",
+              "nativeQueryRef": "Não realizada (GWh)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Restrição diária"
+                    }
+                  },
+                  "Property": "% cortado"
+                }
+              },
+              "queryRef": "Restrição diária.% cortado",
+              "nativeQueryRef": "% cortado"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "vega": [
+        {
+          "properties": {
+            "jsonSpec": {
+              "expr": {
+                "Literal": {
+                  "Value": "'{\n  \"data\": {\n    \"name\": \"dataset\"\n  },\n  \"width\": \"container\",\n  \"height\": \"container\",\n  \"transform\": [\n    {\n      \"filter\": \"datum[''Não realizada (GWh)''] > 0\"\n    }\n  ],\n  \"padding\": {\n    \"right\": 104\n  },\n  \"encoding\": {\n    \"y\": {\n      \"field\": \"Subsistema\",\n      \"type\": \"nominal\",\n      \"sort\": {\n        \"field\": \"Não realizada (GWh)\",\n        \"op\": \"max\",\n        \"order\": \"descending\"\n      },\n      \"title\": null,\n      \"axis\": {\n        \"ticks\": false,\n        \"labelLimit\": 160,\n        \"labelFontSize\": 9\n      }\n    }\n  },\n  \"layer\": [\n    {\n      \"mark\": {\n        \"type\": \"bar\",\n        \"height\": {\n          \"band\": 0.7\n        },\n        \"color\": \"#252423\"\n      },\n      \"encoding\": {\n        \"x\": {\n          \"field\": \"Não realizada (GWh)\",\n          \"type\": \"quantitative\",\n          \"title\": null,\n          \"axis\": {\n            \"format\": \",.0f\",\n            \"tickCount\": 3\n          }\n        },\n        \"tooltip\": [\n          {\n            \"field\": \"Subsistema\"\n          },\n          {\n            \"field\": \"Não realizada (GWh)\",\n            \"title\": \"GWh\",\n            \"format\": \",.0f\"\n          },\n          {\n            \"field\": \"% cortado\",\n            \"format\": \".1%\"\n          }\n        ],\n        \"opacity\": {\n          \"condition\": {\n            \"test\": \"datum.__selected__ == ''off''\",\n            \"value\": 0.25\n          },\n          \"value\": 1\n        }\n      }\n    },\n    {\n      \"mark\": {\n        \"type\": \"text\",\n        \"align\": \"left\",\n        \"dx\": 4,\n        \"fontSize\": 9,\n        \"color\": \"#605E5C\"\n      },\n      \"encoding\": {\n        \"x\": {\n          \"field\": \"Não realizada (GWh)\",\n          \"type\": \"quantitative\"\n        },\n        \"text\": {\n          \"value\": {\n            \"expr\": \"format(datum[''Não realizada (GWh)''], '',.0f'') + '' GWh · '' + format(datum[''% cortado''], ''.1%'')\"\n          }\n        },\n        \"opacity\": {\n          \"condition\": {\n            \"test\": \"datum.__selected__ == ''off''\",\n            \"value\": 0.25\n          },\n          \"value\": 1\n        }\n      }\n    }\n  ]\n}'"
+                }
+              }
+            },
+            "jsonConfig": {
+              "expr": {
+                "Literal": {
+                  "Value": "'{\n  \"locale\": {\n    \"number\": {\n      \"decimal\": \",\",\n      \"thousands\": \".\",\n      \"grouping\": [\n        3\n      ],\n      \"currency\": [\n        \"R$ \",\n        \"\"\n      ]\n    },\n    \"time\": {\n      \"dateTime\": \"%A, %e de %B de %Y. %X\",\n      \"date\": \"%d/%m/%Y\",\n      \"time\": \"%H:%M:%S\",\n      \"periods\": [\n        \"AM\",\n        \"PM\"\n      ],\n      \"days\": [\n        \"domingo\",\n        \"segunda\",\n        \"terça\",\n        \"quarta\",\n        \"quinta\",\n        \"sexta\",\n        \"sábado\"\n      ],\n      \"shortDays\": [\n        \"dom\",\n        \"seg\",\n        \"ter\",\n        \"qua\",\n        \"qui\",\n        \"sex\",\n        \"sáb\"\n      ],\n      \"months\": [\n        \"janeiro\",\n        \"fevereiro\",\n        \"março\",\n        \"abril\",\n        \"maio\",\n        \"junho\",\n        \"julho\",\n        \"agosto\",\n        \"setembro\",\n        \"outubro\",\n        \"novembro\",\n        \"dezembro\"\n      ],\n      \"shortMonths\": [\n        \"jan\",\n        \"fev\",\n        \"mar\",\n        \"abr\",\n        \"mai\",\n        \"jun\",\n        \"jul\",\n        \"ago\",\n        \"set\",\n        \"out\",\n        \"nov\",\n        \"dez\"\n      ]\n    }\n  },\n  \"autosize\": {\n    \"type\": \"fit\",\n    \"contains\": \"padding\"\n  },\n  \"background\": \"transparent\",\n  \"font\": \"Segoe UI, Open Sans, sans-serif\",\n  \"view\": {\n    \"stroke\": null\n  },\n  \"axis\": {\n    \"labelColor\": \"#605E5C\",\n    \"titleColor\": \"#605E5C\",\n    \"labelFontSize\": 10,\n    \"titleFontSize\": 10,\n    \"titleFontWeight\": \"normal\",\n    \"gridColor\": \"#EDEBE9\",\n    \"domain\": false,\n    \"tickColor\": \"#E1DFDD\"\n  },\n  \"axisX\": {\n    \"grid\": false\n  },\n  \"legend\": {\n    \"labelColor\": \"#605E5C\",\n    \"titleColor\": \"#605E5C\",\n    \"labelFontSize\": 10,\n    \"symbolType\": \"square\"\n  },\n  \"bar\": {\n    \"cornerRadiusEnd\": 0\n  },\n  \"line\": {\n    \"strokeWidth\": 2\n  }\n}'"
+                }
+              }
+            },
+            "provider": {
+              "expr": {
+                "Literal": {
+                  "Value": "'vegaLite'"
+                }
+              }
+            },
+            "renderMode": {
+              "expr": {
+                "Literal": {
+                  "Value": "'svg'"
+                }
+              }
+            },
+            "enableTooltips": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "enableSelection": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "selectionMaxDataPoints": {
+              "expr": {
+                "Literal": {
+                  "Value": "250D"
+                }
+              }
+            },
+            "version": {
+              "expr": {
+                "Literal": {
+                  "Value": "'6.4.3'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "developer": [
+        {
+          "properties": {
+            "locale": {
+              "expr": {
+                "Literal": {
+                  "Value": "'pt-BR'"
+                }
+              }
+            },
+            "version": {
+              "expr": {
+                "Literal": {
+                  "Value": "'2.0.1.0'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateManagement": [
+        {
+          "properties": {
+            "viewportHeight": {
+              "expr": {
+                "Literal": {
+                  "Value": "157D"
+                }
+              }
+            },
+            "viewportWidth": {
+              "expr": {
+                "Literal": {
+                  "Value": "362D"
+                }
+              }
+            },
+            "supportFieldConfiguration": {
+              "expr": {
+                "Literal": {
+                  "Value": "'{\"Subsistema\":{\"highlight\":false,\"highlightStatus\":false,\"highlightComparator\":false,\"format\":false,\"formatted\":false,\"names\":false},\"Não realizada (GWh)\":{\"highlight\":false,\"highlightStatus\":false,\"highlightComparator\":false,\"format\":true,\"formatted\":true,\"names\":false},\"% cortado\":{\"highlight\":false,\"highlightStatus\":false,\"highlightComparator\":false,\"format\":true,\"formatted\":true,\"names\":false}}'"
+                }
+              }
+            },
+            "denebMetaVersion": {
+              "expr": {
+                "Literal": {
+                  "Value": "'2'"
+                }
+              }
+            },
+            "consolidateFieldParameters": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Corte por subsistema'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "11D"
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#191919'"
+                    }
+                  }
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#FFFFFF'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#E1DFDD'"
+                    }
+                  }
+                }
+              }
+            },
+            "width": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
+                }
+              }
+            },
+            "radius": {
+              "expr": {
+                "Literal": {
+                  "Value": "2D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualHeader": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Barras com a geração não realizada e o percentual cortado por subsistema elétrico.'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

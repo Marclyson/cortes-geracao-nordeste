@@ -1,0 +1,10 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/1.4.0/schema.json",
+  "name": "dica_mes",
+  "displayName": "Dica · mês",
+  "displayOption": "ActualSize",
+  "height": 270,
+  "width": 360,
+  "type": "Tooltip",
+  "visibility": "HiddenInViewMode"
+}

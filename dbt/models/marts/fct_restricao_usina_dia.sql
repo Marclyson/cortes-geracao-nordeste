@@ -10,6 +10,7 @@
     begin='2021-10-01',
     batch_size='month',
     lookback=2,
+    on_schema_change='append_new_columns',
     indexes=[{'columns': ['usina_id', 'dia'], 'unique': true}, {'columns': ['dia']}]
 ) }}
 
@@ -31,6 +32,9 @@ select
     coalesce(sum(nao_realizada_mwh) filter (where razao = 'CNF'), 0) as nao_realizada_cnf_mwh,
     coalesce(sum(nao_realizada_mwh) filter (where razao = 'REL'), 0) as nao_realizada_rel_mwh,
     coalesce(sum(nao_realizada_mwh) filter (where razao = 'PAR'), 0) as nao_realizada_par_mwh,
-    coalesce(sum(nao_realizada_mwh) filter (where razao is null), 0) as nao_realizada_sem_razao_mwh
+    coalesce(sum(nao_realizada_mwh) filter (where razao is null), 0) as nao_realizada_sem_razao_mwh,
+    coalesce(sum(nao_realizada_mwh) filter (where origem = 'LOC'), 0) as nao_realizada_loc_mwh,
+    coalesce(sum(nao_realizada_mwh) filter (where origem = 'SIS'), 0) as nao_realizada_sis_mwh,
+    coalesce(sum(nao_realizada_mwh) filter (where origem is null), 0) as nao_realizada_sem_origem_mwh
 from {{ ref('int_restricao_semihoraria') }}
 group by usina_id, dia

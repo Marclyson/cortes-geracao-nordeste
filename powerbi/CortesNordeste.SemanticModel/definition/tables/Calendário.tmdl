@@ -1,0 +1,62 @@
+/// Calendário diário (marts.dim_data)
+table Calendário
+	lineageTag: 14691a66-76a0-4d96-a2a1-59684e3fd337
+	dataCategory: Time
+
+	column Data
+		dataType: dateTime
+		isKey
+		formatString: dd/mm/yyyy
+		lineageTag: e2be46d1-38ad-44da-b138-3fa26f1134b9
+		summarizeBy: none
+		sourceColumn: dia
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Ano
+		dataType: int64
+		formatString: 0
+		lineageTag: 089cb3fd-f8a7-464f-a161-191fc1fc208d
+		summarizeBy: none
+		sourceColumn: ano
+
+	column mes_numero
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 294d5f9d-1467-4e54-a800-ab42954eb4b0
+		summarizeBy: none
+		sourceColumn: mes_numero
+
+	column Mês
+		dataType: dateTime
+		formatString: mmm/yyyy
+		lineageTag: 2b9da8b4-dbf0-454e-afeb-f28e1f8cd773
+		summarizeBy: none
+		sourceColumn: mes
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column ano_mes
+		dataType: string
+		isHidden
+		lineageTag: 847976d8-d21b-4f84-a098-12edb4e5e3aa
+		summarizeBy: none
+		sourceColumn: ano_mes
+
+	column 'Mês (rótulo)'
+		dataType: string
+		lineageTag: 8c2c27c3-9280-4955-b013-692917529543
+		summarizeBy: none
+		sourceColumn: mes_rotulo
+		sortByColumn: Mês
+
+	partition Calendário = m
+		mode: import
+		source =
+				let
+				    Fonte = PostgreSQL.Database(Servidor, Banco),
+				    Tabela = Fonte{[Schema = "marts", Item = "dim_data"]}[Data]
+				in
+				    Tabela
+

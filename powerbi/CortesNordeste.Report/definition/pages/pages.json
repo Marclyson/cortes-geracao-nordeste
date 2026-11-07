@@ -1,0 +1,14 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/pagesMetadata/1.0.0/schema.json",
+  "pageOrder": [
+    "visao_geral",
+    "razoes_sazonalidade",
+    "estados_usinas",
+    "usinas_agentes",
+    "detalhe_usina",
+    "dica_mes",
+    "dica_estado",
+    "dica_usina"
+  ],
+  "activePageName": "visao_geral"
+}

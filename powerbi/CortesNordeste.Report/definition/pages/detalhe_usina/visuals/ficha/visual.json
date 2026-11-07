@@ -1,0 +1,167 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.3.0/schema.json",
+  "name": "ficha",
+  "position": {
+    "x": 24,
+    "y": 84,
+    "z": 2000,
+    "height": 104,
+    "width": 1232,
+    "tabOrder": 4000
+  },
+  "visual": {
+    "visualType": "htmlContent443BE3AD55E043BF878BED274D3A6865",
+    "query": {
+      "queryState": {
+        "content": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Restrição diária"
+                    }
+                  },
+                  "Property": "html · Usina"
+                }
+              },
+              "queryRef": "Restrição diária.html · Usina",
+              "nativeQueryRef": "html · Usina"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "compatibility": [
+        {
+          "properties": {
+            "legacyRendering": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stylesheet": [
+        {
+          "properties": {
+            "stylesheet": {
+              "expr": {
+                "Literal": {
+                  "Value": "'*{font-family:''Segoe UI'',sans-serif}.vazio{font-size:13px;color:#8A8886}.wrap{display:flex;gap:16px;align-items:stretch}\n.cab{flex:1.25;background:#191919;padding:14px 18px;border-top:3px solid #F2C811}\n.k{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#F2C811;font-weight:700}\n.nm{font-size:22px;font-weight:600;color:#FFFFFF;margin:4px 0 8px 0}\n.at{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:11px;color:#C8C6C4}.at b{color:#FFFFFF;font-weight:600;margin-right:4px}\n.kp{flex:2;display:flex;gap:10px}\n.c{flex:1;background:#FFFFFF;border:1px solid #E1DFDD;border-top:3px solid #191919;padding:10px 12px}\n.r{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#605E5C}\n.v{font-size:24px;font-weight:600;color:#191919;margin-top:6px}.v small{font-size:12px;color:#605E5C;font-weight:400}.v.t{font-size:14px;line-height:1.25}'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualHeader": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "padding": [
+        {
+          "properties": {
+            "top": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "bottom": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "left": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "right": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Ficha da usina selecionada: cadastro, geração não realizada, percentual cortado, dias com corte, horas por dia com corte e razão principal.'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

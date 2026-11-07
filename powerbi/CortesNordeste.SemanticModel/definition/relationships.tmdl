@@ -1,0 +1,28 @@
+relationship 244f1722-c5df-5c96-858a-5ee2238eb9c2
+	fromColumn: 'Restrição diária'.usina_id
+	toColumn: Usinas.'ID da usina'
+
+relationship 9d586b6d-508a-5abb-9352-2a2b194a4566
+	fromColumn: 'Restrição diária'.dia
+	toColumn: Calendário.Data
+
+relationship ca561b8a-4edf-5330-850a-45334c2cacfc
+	fromColumn: 'Perfil horário'.mes
+	toColumn: Calendário.Data
+
+relationship 812e18e7-ee91-5dae-8820-d1d13274e762
+	fromColumn: 'Perfil horário'.fonte
+	toColumn: Fontes.Código
+
+relationship 7d1973a0-8ecd-5b91-b9a6-590ac59790a0
+	fromColumn: 'Perfil horário'.uf
+	toColumn: Estados.UF
+
+relationship 5b23d8e7-f830-524f-ab0a-9b4d892a68d3
+	fromColumn: Usinas.'Código da fonte'
+	toColumn: Fontes.Código
+
+relationship cfe1550e-f96a-51cf-9419-5cff99284c28
+	fromColumn: Usinas.UF
+	toColumn: Estados.UF
+

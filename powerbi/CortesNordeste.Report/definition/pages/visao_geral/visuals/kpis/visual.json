@@ -1,0 +1,167 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.3.0/schema.json",
+  "name": "kpis",
+  "position": {
+    "x": 24,
+    "y": 80,
+    "z": 2000,
+    "height": 144,
+    "width": 1232,
+    "tabOrder": 4000
+  },
+  "visual": {
+    "visualType": "htmlContent443BE3AD55E043BF878BED274D3A6865",
+    "query": {
+      "queryState": {
+        "content": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Restrição diária"
+                    }
+                  },
+                  "Property": "html · KPIs"
+                }
+              },
+              "queryRef": "Restrição diária.html · KPIs",
+              "nativeQueryRef": "html · KPIs"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "compatibility": [
+        {
+          "properties": {
+            "legacyRendering": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stylesheet": [
+        {
+          "properties": {
+            "stylesheet": {
+              "expr": {
+                "Literal": {
+                  "Value": "'.cab{display:flex;justify-content:space-between;font-family:''Segoe UI'',sans-serif;font-size:11px;color:#605E5C;margin:0 2px 8px 2px}\n.cab .per{color:#191919;font-weight:600}\n.kpis{display:flex;gap:12px;font-family:''Segoe UI'',sans-serif}\n.card{flex:1;background:#FFFFFF;border:1px solid #E1DFDD;border-top:3px solid #191919;padding:10px 12px;border-radius:2px}\n.card:first-child{border-top-color:#F2C811}\n.rot{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#605E5C}\n.lin{display:flex;justify-content:space-between;align-items:flex-end;margin-top:4px}\n.val{font-size:28px;font-weight:600;color:#191919;line-height:1.1}\n.un{font-size:13px;font-weight:400;color:#605E5C;margin-left:3px}\n.var{font-size:12px;font-weight:600;margin-top:3px}\n.ruim{color:#C84720}.bom{color:#107C10}.neu{color:#8A8886;font-weight:400}\n.spk{padding-bottom:2px}\n.leg{font-family:''Segoe UI'',sans-serif;font-size:10px;color:#8A8886;margin:6px 2px 0 2px}'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualHeader": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "padding": [
+        {
+          "properties": {
+            "top": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "bottom": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "left": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "right": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Indicadores dos últimos 12 meses, ou do ano filtrado: geração não realizada em GWh, percentual da geração possível cortada, geração verificada e usinas com corte, com a variação contra o período anterior equivalente e a tendência de 24 meses.'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

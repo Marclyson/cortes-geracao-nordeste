@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "CortesNordeste"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "02e21fc1-4979-56b0-bb3c-d43ab48a075e"
+  }
+}

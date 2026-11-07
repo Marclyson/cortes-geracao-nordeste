@@ -1,0 +1,135 @@
+/// Geração e geração não realizada por mês, fonte, estado e patamar de 30 minutos (marts.fct_restricao_perfil_horario)
+table 'Perfil horário'
+	lineageTag: 81e1c108-d8d7-5349-8dfc-eadc36b196e6
+
+	/// Geração não realizada no patamar de 30 minutos
+	measure 'Não realizada no horário (GWh)' = DIVIDE(SUM('Perfil horário'[nao_realizada_mwh]), 1000)
+		formatString: #,0
+		lineageTag: 48780ac6-0ccc-5084-a266-b65b95a1135b
+
+	/// Parte da geração possível cortada no patamar de 30 minutos
+	measure '% cortado no horário' = DIVIDE(SUM('Perfil horário'[nao_realizada_mwh]), SUM('Perfil horário'[geracao_mwh]) + SUM('Perfil horário'[nao_realizada_mwh]))
+		formatString: 0.0%
+		lineageTag: 35527f51-8a7d-5c82-8263-205fd5774308
+
+	measure 'Geração no horário (GWh)' = DIVIDE(SUM('Perfil horário'[geracao_mwh]), 1000)
+		formatString: #,0
+		lineageTag: 619ac898-d05d-51e3-9a66-410eda2f2a74
+
+	column mes
+		dataType: dateTime
+		isHidden
+		formatString: mmm/yyyy
+		lineageTag: 67f3ad99-874b-554f-9d11-9257af95d958
+		summarizeBy: none
+		sourceColumn: mes
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column fonte
+		dataType: string
+		isHidden
+		lineageTag: e55dff5e-0551-5c2d-809d-80525898c57f
+		summarizeBy: none
+		sourceColumn: fonte
+
+	column uf
+		dataType: string
+		isHidden
+		lineageTag: 83fb5949-493f-5cdc-b668-55e5e3a8d08d
+		summarizeBy: none
+		sourceColumn: uf
+
+	column Patamar
+		dataType: string
+		lineageTag: 92c56b28-3b06-50e3-b44d-c91892c04dd3
+		summarizeBy: none
+		sourceColumn: patamar
+
+	column Hora
+		dataType: int64
+		formatString: 0
+		lineageTag: 9acce47a-6d49-5e99-9968-965cf65a0c15
+		summarizeBy: none
+		sourceColumn: hora
+
+	column usinas
+		dataType: int64
+		isHidden
+		lineageTag: c2080970-a638-5fa6-b8d1-b7ddd0b5c0f2
+		summarizeBy: sum
+		sourceColumn: usinas
+
+	column registros
+		dataType: int64
+		isHidden
+		lineageTag: 2091d632-bd9c-56ea-b487-a476765a34b7
+		summarizeBy: sum
+		sourceColumn: registros
+
+	column registros_limitados
+		dataType: int64
+		isHidden
+		lineageTag: 3307514e-19e4-5e52-91e4-1bb3eb35382a
+		summarizeBy: sum
+		sourceColumn: registros_limitados
+
+	column geracao_mwh
+		dataType: double
+		isHidden
+		lineageTag: 56bce136-8ca3-563b-9727-edaa1579db84
+		summarizeBy: sum
+		sourceColumn: geracao_mwh
+
+	column referencia_mwh
+		dataType: double
+		isHidden
+		lineageTag: fd6a821b-00bf-58f1-be42-3959c2a18079
+		summarizeBy: sum
+		sourceColumn: referencia_mwh
+
+	column nao_realizada_mwh
+		dataType: double
+		isHidden
+		lineageTag: 8b4dbde3-70bc-57d1-8e8f-7922e4e33247
+		summarizeBy: sum
+		sourceColumn: nao_realizada_mwh
+
+	column nao_realizada_ene_mwh
+		dataType: double
+		isHidden
+		lineageTag: 8c269740-46dd-5d41-8007-0f9fc3e42e98
+		summarizeBy: sum
+		sourceColumn: nao_realizada_ene_mwh
+
+	column nao_realizada_cnf_mwh
+		dataType: double
+		isHidden
+		lineageTag: 80277420-7d19-5a35-bbeb-e8df63007cb2
+		summarizeBy: sum
+		sourceColumn: nao_realizada_cnf_mwh
+
+	column nao_realizada_rel_mwh
+		dataType: double
+		isHidden
+		lineageTag: 49857d6f-8497-5e5f-bc97-c5b3bb6360d1
+		summarizeBy: sum
+		sourceColumn: nao_realizada_rel_mwh
+
+	column nao_realizada_par_mwh
+		dataType: double
+		isHidden
+		lineageTag: 2c20ccde-448f-57b5-aafe-1542d33aa501
+		summarizeBy: sum
+		sourceColumn: nao_realizada_par_mwh
+
+	partition 'Perfil horário' = m
+		mode: import
+		source =
+				let
+				    Fonte = PostgreSQL.Database(Servidor, Banco),
+				    Tabela = Fonte{[Schema = "marts", Item = "fct_restricao_perfil_horario"]}[Data],
+				    Patamar = Table.TransformColumns(Tabela, {{"patamar", each Time.ToText(_, "HH:mm"), type text}})
+				in
+				    Patamar
+
